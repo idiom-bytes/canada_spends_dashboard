@@ -297,9 +297,8 @@
     <header>
       <div class="top-bar">
         <div>
-          <span class="badge">Canada Spends</span>
-          <h1>Spending Dashboard</h1>
-          <p>Single-page dashboard for exploring the public CSV files. Narrow dashboards load first, with Explore mode available on demand.</p>
+          <h1>Canada Spends Dashboard</h1>
+          <p>Single-page dashboards and data exploration tool.</p>
         </div>
         <div class="tabs" role="tablist" aria-label="Dashboard modes">
           <button class="tab-button active" id="tab-dashboards" type="button" data-tab="dashboards" role="tab" aria-selected="true">Dashboards</button>
@@ -387,13 +386,13 @@
 
   <script>
     const csvFiles = [
-      "public/aggregated-contracts-under-10k.txt",
-      "public/contracts-over-10k.txt",
-      "public/transfers.txt",
-      "public/cihr_grants.txt",
-      "public/nserc_grants.txt",
-      "public/sshrc_grants.txt",
-      "public/global_affairs_grants.txt"
+      "public/aggregated-contracts-under-10k.csv",
+      "public/contracts-over-10k.csv",
+      "public/transfers.csv",
+      "public/cihr_grants.csv",
+      "public/nserc_grants.csv",
+      "public/sshrc_grants.csv",
+      "public/global_affairs_grants.csv"
     ];
 
     const cache = new Map();
@@ -533,11 +532,12 @@
     }
 
     function getSortedGroups(groups) {
-      const numeric = groups.every(group => !Number.isNaN(Number(group)));
+      const groupsArray = Array.from(groups);
+      const numeric = groupsArray.every(group => !Number.isNaN(Number(group)));
       if (numeric) {
-        return [...groups].sort((a, b) => Number(a) - Number(b));
+        return groupsArray.sort((a, b) => Number(a) - Number(b));
       }
-      return [...groups].sort((a, b) => String(a).localeCompare(String(b)));
+      return groupsArray.sort((a, b) => String(a).localeCompare(String(b)));
     }
 
     function aggregateRows(rows, config) {
@@ -755,7 +755,12 @@
       if (cache.has(path)) {
         return cache.get(path);
       }
-      const response = await fetch(path);
+      // Add cache-busting parameter to force fresh fetch
+      const cacheBuster = `?_cb=${Date.now()}`;
+      const response = await fetch(path + cacheBuster);
+      if (!response.ok) {
+        throw new Error(`Failed to load CSV: ${path} (${response.status})`);
+      }
       const text = await response.text();
       const parsed = parseCSV(text);
       cache.set(path, parsed);
@@ -876,7 +881,11 @@
     }
 
     async function loadDashboardConfigs() {
-      const response = await fetch("dashboard_configs.json");
+      const cacheBuster = `?_cb=${Date.now()}`;
+      const response = await fetch("dashboard_configs.json" + cacheBuster);
+      if (!response.ok) {
+        throw new Error(`Failed to load dashboard configs (${response.status})`);
+      }
       return response.json();
     }
 
@@ -884,35 +893,87 @@
       if (!path) {
         return null;
       }
-      const response = await fetch(path);
-      return response.json();
+      try {
+        const cacheBuster = `?_cb=${Date.now()}`;
+        const response = await fetch(path + cacheBuster);
+        if (!response.ok) {
+          console.warn(`Failed to load mapping: ${path}`);
+          return null;
+        }
+        return response.json();
+      } catch (err) {
+        console.warn(`Error loading mapping ${path}:`, err);
+        return null;
+      }
+    }
+
+    async function loadPreAggregated(dashboardId) {
+      // Try to load pre-aggregated JSON for instant loading
+      try {
+        const cacheBuster = `?_cb=${Date.now()}`;
+        const response = await fetch(`public/dashboards/${dashboardId}.json${cacheBuster}`);
+        if (response.ok) {
+          return response.json();
+        }
+      } catch (err) {
+        console.log(`No pre-aggregated data for ${dashboardId}, falling back to CSV`);
+      }
+      return null;
     }
 
     async function updateNarrowMode(config) {
       if (!config) {
         return;
       }
-      const csvPath = config.csvs[0];
-      const { rows } = await loadCsv(csvPath);
-      const mapping = config.mapping ? await loadMapping(config.mapping) : null;
-      const aggregated = aggregateRows(rows, {
-        groupBy: config.groupBy,
-        seriesBy: config.seriesBy,
-        valueField: config.valueField,
-        extractYear: config.extractYear,
-        minSeriesTotal: config.minSeriesTotal,
-        maxSeries: config.maxSeries,
-        topSeriesPerGroup: config.topSeriesPerGroup,
-        mapping
-      });
+      try {
+        // Try pre-aggregated data first (instant loading)
+        const preAggregated = await loadPreAggregated(config.id);
 
-      elements.narrowTitle.textContent = config.title;
-      elements.narrowSubtitle.textContent = config.subtitle || "";
-      elements.narrowNote.textContent = config.note || "";
-      elements.narrowDescription.textContent = config.description || "";
+        let aggregated;
+        let title = config.title;
+        let subtitle = config.subtitle || "";
+        let note = config.note || "";
+        let description = config.description || "";
 
-      renderLegend(elements.narrowLegend, aggregated.series);
-      renderChart(elements.narrowChart, aggregated);
+        if (preAggregated) {
+          console.log(`Loaded pre-aggregated data for ${config.id}`);
+          aggregated = preAggregated.aggregated;
+          title = preAggregated.title || title;
+          subtitle = preAggregated.subtitle || subtitle;
+          note = preAggregated.note || note;
+          description = preAggregated.description || description;
+        } else {
+          // Fall back to loading CSV and aggregating in browser
+          console.log(`Loading CSV for ${config.id}...`);
+          const csvPath = config.csvs[0];
+          const { rows } = await loadCsv(csvPath);
+          const mapping = config.mapping ? await loadMapping(config.mapping) : null;
+          aggregated = aggregateRows(rows, {
+            groupBy: config.groupBy,
+            seriesBy: config.seriesBy,
+            valueField: config.valueField,
+            extractYear: config.extractYear,
+            minSeriesTotal: config.minSeriesTotal,
+            maxSeries: config.maxSeries,
+            topSeriesPerGroup: config.topSeriesPerGroup,
+            mapping
+          });
+        }
+
+        elements.narrowTitle.textContent = title;
+        elements.narrowSubtitle.textContent = subtitle;
+        elements.narrowNote.textContent = note;
+        elements.narrowDescription.textContent = description;
+
+        renderLegend(elements.narrowLegend, aggregated.series);
+        renderChart(elements.narrowChart, aggregated);
+      } catch (err) {
+        console.error("Failed to update narrow mode:", err);
+        elements.narrowTitle.textContent = "Error loading dashboard";
+        elements.narrowNote.textContent = err.message;
+        elements.narrowChart.innerHTML = "";
+        elements.narrowLegend.innerHTML = "";
+      }
     }
 
     async function wireNarrowMode() {
@@ -940,9 +1001,21 @@
       setActiveTab("dashboards");
       elements.tabDashboards.addEventListener("click", () => setActiveTab("dashboards"));
       elements.tabExplore.addEventListener("click", () => setActiveTab("explore"));
-      wireOpenControls();
-      await updateOpenMode();
-      await wireNarrowMode();
+
+      // Initialize narrow mode first (dashboards tab is default)
+      try {
+        await wireNarrowMode();
+      } catch (err) {
+        console.error("Failed to initialize narrow mode:", err);
+      }
+
+      // Initialize explore mode separately so errors don't block narrow mode
+      try {
+        wireOpenControls();
+        await updateOpenMode();
+      } catch (err) {
+        console.error("Failed to initialize open mode:", err);
+      }
     }
 
     initialize();

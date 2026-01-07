@@ -4,11 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Canada Spends Dashboard</title>
-  <script type="module">
-    // Import hyparquet for reading Parquet files in the browser
-    import { parquetRead } from 'https://cdn.jsdelivr.net/npm/hyparquet/dist/hyparquet.min.js';
-    window.parquetRead = parquetRead;
-  </script>
   <style>
     :root {
       --ink: #333333;
@@ -286,6 +281,34 @@
       letter-spacing: 0.08em;
     }
 
+    .loading-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .controls.loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
     @media (max-width: 900px) {
       .panel {
         padding: 18px;
@@ -376,6 +399,7 @@
             <h3 id="open-title">Explore Mode Snapshot</h3>
             <p class="subtitle" id="open-subtitle">Current $ (not inflation-adjusted)</p>
             <p class="note" id="open-note">Use the controls above to change groupings and filters.</p>
+            <p class="warning" id="open-warning" style="display:none; color:#b45309; background:#fef3c7; padding:8px 12px; border-radius:8px; font-size:13px; margin-top:8px;"></p>
             <div class="legend" id="open-legend"></div>
             <div class="series-toggles" id="open-series-toggles"></div>
           </div>
@@ -389,7 +413,10 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // Import hyparquet for reading Parquet files in the browser
+    import { parquetRead, asyncBufferFromUrl } from 'https://cdn.jsdelivr.net/npm/hyparquet/src/index.js';
+
     // Data files (Parquet format)
     const dataFiles = [
       "aggregated-contracts-under-10k",
@@ -406,27 +433,25 @@
     // Load Parquet file and convert to rows
     async function loadParquet(name) {
       const parquetPath = `public/${name}.parquet`;
-      const cacheBuster = `?_cb=${Date.now()}`;
-
-      const response = await fetch(parquetPath + cacheBuster);
-      if (!response.ok) {
-        throw new Error(`Failed to load Parquet: ${parquetPath} (${response.status})`);
-      }
-
-      const arrayBuffer = await response.arrayBuffer();
       let headers = [];
       const rows = [];
 
-      await window.parquetRead({
-        file: arrayBuffer,
-        onComplete: (data) => {
-          if (data.length === 0) return;
-          headers = Object.keys(data[0]);
-          data.forEach(row => rows.push(row));
-        }
-      });
+      try {
+        const file = await asyncBufferFromUrl({ url: parquetPath });
 
-      console.log(`Loaded Parquet: ${name} (${rows.length} rows)`);
+        await parquetRead({
+          file,
+          rowFormat: 'object',
+          onComplete: (data) => {
+            if (!data || data.length === 0) return;
+            headers = Object.keys(data[0]);
+            data.forEach(row => rows.push(row));
+          }
+        });
+      } catch (err) {
+        console.error(`Error loading parquet ${name}:`, err);
+        throw err;
+      }
       return { headers, rows };
     }
 
@@ -452,6 +477,8 @@
       openChart: document.getElementById("open-chart"),
       openLegend: document.getElementById("open-legend"),
       openSeriesToggles: document.getElementById("open-series-toggles"),
+      openWarning: document.getElementById("open-warning"),
+      openControls: document.querySelector("#panel-explore .controls"),
       narrowSelect: document.getElementById("narrow-select"),
       narrowChart: document.getElementById("narrow-chart"),
       narrowLegend: document.getElementById("narrow-legend"),
@@ -459,11 +486,24 @@
       narrowSubtitle: document.getElementById("narrow-subtitle"),
       narrowNote: document.getElementById("narrow-note"),
       narrowDescription: document.getElementById("narrow-description"),
+      narrowControls: document.querySelector("#panel-dashboards .controls"),
       tabDashboards: document.getElementById("tab-dashboards"),
       tabExplore: document.getElementById("tab-explore"),
       panelDashboards: document.getElementById("panel-dashboards"),
       panelExplore: document.getElementById("panel-explore")
     };
+
+    function showLoading(chartEl, controlsEl, message = "Loading data...") {
+      if (controlsEl) controlsEl.classList.add("loading");
+      chartEl.innerHTML = `<div class="loading-overlay"><div class="spinner"></div><span>${message}</span></div>`;
+      // Clear related elements
+      if (elements.openLegend) elements.openLegend.innerHTML = "";
+      if (elements.openSeriesToggles) elements.openSeriesToggles.innerHTML = "";
+    }
+
+    function hideLoading(controlsEl) {
+      if (controlsEl) controlsEl.classList.remove("loading");
+    }
 
     function parseCSV(text) {
       const rows = [];
@@ -651,7 +691,16 @@
         }
       }
 
-      const groups = getSortedGroups(groupSet);
+      let groups = getSortedGroups(groupSet);
+      let warning = null;
+
+      // Limit groups to prevent browser hang
+      const maxGroups = config.maxGroups || 100;
+      if (groups.length > maxGroups) {
+        warning = `Showing ${maxGroups} of ${groups.length} groups. Select a different "Group By" field or use filters.`;
+        groups = groups.slice(0, maxGroups);
+      }
+
       const data = groups.map(group => {
         const series = {};
         const groupMap = totals.get(String(group)) ?? new Map();
@@ -661,7 +710,7 @@
         return { group, series };
       });
 
-      return { groups, series: seriesList, data };
+      return { groups, series: seriesList, data, warning };
     }
 
     function renderLegend(container, seriesList, visibility) {
@@ -809,55 +858,114 @@
       });
     }
 
+    // Smart field selection helpers
+    function findBestGroupByField(headers, rows) {
+      // Prefer year-related fields for groupBy
+      const yearPatterns = ['year', 'yr', 'fiscal', 'fscl', 'date'];
+      for (const pattern of yearPatterns) {
+        const match = headers.find(h => h.toLowerCase().includes(pattern) && !h.toLowerCase().includes('id'));
+        if (match) return match;
+      }
+      // Avoid ID fields and high-cardinality fields
+      const avoidPatterns = ['id', 'rowid', 'uuid', 'key', 'desc', 'name', 'nm', 'nml'];
+      const safeField = headers.find(h => {
+        const lower = h.toLowerCase();
+        return !avoidPatterns.some(p => lower.includes(p));
+      });
+      return safeField || headers[0];
+    }
+
+    function findBestSeriesField(headers, groupByField) {
+      // Prefer department/category fields for series
+      const seriesPatterns = ['dept', 'org', 'ministry', 'min', 'category', 'type', 'class', 'prov'];
+      for (const pattern of seriesPatterns) {
+        const match = headers.find(h =>
+          h.toLowerCase().includes(pattern) &&
+          h !== groupByField &&
+          h.toLowerCase().includes('en') // Prefer English
+        );
+        if (match) return match;
+      }
+      // Fall back to any field that's not the groupBy
+      return headers.find(h => h !== groupByField) || "(none)";
+    }
+
+    function findBestValueField(headers) {
+      // Prefer amount/value fields
+      const valuePatterns = ['amount', 'amt', 'value', 'total', 'sum', 'cost', 'price'];
+      for (const pattern of valuePatterns) {
+        const match = headers.find(h => h.toLowerCase().includes(pattern));
+        if (match) return match;
+      }
+      return headers[headers.length - 1];
+    }
+
     async function updateOpenMode() {
-      const { headers, rows } = await loadData(openState.dataFile);
-      if (!openState.groupBy) {
-        openState.groupBy = headers[0];
-      }
-      if (!openState.seriesBy) {
-        openState.seriesBy = headers[1] ?? headers[0];
-      }
-      if (!openState.valueField) {
-        openState.valueField = headers.find(header => header.toLowerCase().includes("amount")) || headers[headers.length - 1];
-      }
+      showLoading(elements.openChart, elements.openControls, "Loading data...");
 
-      populateSelect(elements.openGroup, headers, null);
-      populateSelect(elements.openSeries, ["(none)", ...headers], null);
-      populateSelect(elements.openValue, headers, null);
-
-      elements.openGroup.value = openState.groupBy;
-      elements.openSeries.value = openState.seriesBy ?? "(none)";
-      elements.openValue.value = openState.valueField;
-      elements.openExtractYear.checked = openState.extractYear;
-      elements.openMinSeries.value = openState.minSeriesTotal;
-      elements.openMaxSeries.value = openState.maxSeries;
-
-      const seriesBy = openState.seriesBy === "(none)" ? null : openState.seriesBy;
-      const aggregated = aggregateRows(rows, {
-        groupBy: openState.groupBy,
-        seriesBy,
-        valueField: openState.valueField,
-        extractYear: openState.extractYear,
-        minSeriesTotal: openState.minSeriesTotal,
-        maxSeries: openState.maxSeries
-      });
-
-      if (!openState.seriesVisibility.size) {
-        aggregated.series.forEach(series => openState.seriesVisibility.add(series));
-      }
-
-      renderLegend(elements.openLegend, aggregated.series, openState.seriesVisibility);
-      renderSeriesToggles(elements.openSeriesToggles, aggregated.series, openState.seriesVisibility, (series, visible) => {
-        if (visible) {
-          openState.seriesVisibility.add(series);
-        } else {
-          openState.seriesVisibility.delete(series);
+      try {
+        const { headers, rows } = await loadData(openState.dataFile);
+        if (!openState.groupBy) {
+          openState.groupBy = findBestGroupByField(headers, rows);
         }
-        renderLegend(elements.openLegend, aggregated.series, openState.seriesVisibility);
-        renderChart(elements.openChart, aggregated, { visibility: openState.seriesVisibility });
-      });
+        if (!openState.seriesBy) {
+          openState.seriesBy = findBestSeriesField(headers, openState.groupBy);
+        }
+        if (!openState.valueField) {
+          openState.valueField = findBestValueField(headers);
+        }
 
-      renderChart(elements.openChart, aggregated, { visibility: openState.seriesVisibility });
+        // Filter out useless fields like rowid
+        const usableHeaders = headers.filter(h => !['rowid', 'row_id', 'id'].includes(h.toLowerCase()));
+
+        populateSelect(elements.openGroup, usableHeaders, null);
+        populateSelect(elements.openSeries, ["(none)", ...usableHeaders], null);
+        populateSelect(elements.openValue, usableHeaders, null);
+
+        elements.openGroup.value = openState.groupBy;
+        elements.openSeries.value = openState.seriesBy ?? "(none)";
+        elements.openValue.value = openState.valueField;
+        elements.openExtractYear.checked = openState.extractYear;
+        elements.openMinSeries.value = openState.minSeriesTotal;
+        elements.openMaxSeries.value = openState.maxSeries;
+
+        const seriesBy = openState.seriesBy === "(none)" ? null : openState.seriesBy;
+        const aggregated = aggregateRows(rows, {
+          groupBy: openState.groupBy,
+          seriesBy,
+          valueField: openState.valueField,
+          extractYear: openState.extractYear,
+          minSeriesTotal: openState.minSeriesTotal,
+          maxSeries: openState.maxSeries
+        });
+
+        if (!openState.seriesVisibility.size) {
+          aggregated.series.forEach(series => openState.seriesVisibility.add(series));
+        }
+
+        // Show/hide warning
+        if (aggregated.warning) {
+          elements.openWarning.textContent = aggregated.warning;
+          elements.openWarning.style.display = "block";
+        } else {
+          elements.openWarning.style.display = "none";
+        }
+
+        renderLegend(elements.openLegend, aggregated.series, openState.seriesVisibility);
+        renderSeriesToggles(elements.openSeriesToggles, aggregated.series, openState.seriesVisibility, (series, visible) => {
+          if (visible) {
+            openState.seriesVisibility.add(series);
+          } else {
+            openState.seriesVisibility.delete(series);
+          }
+          renderLegend(elements.openLegend, aggregated.series, openState.seriesVisibility);
+          renderChart(elements.openChart, aggregated, { visibility: openState.seriesVisibility });
+        });
+
+        renderChart(elements.openChart, aggregated, { visibility: openState.seriesVisibility });
+      } finally {
+        hideLoading(elements.openControls);
+      }
     }
 
     function wireOpenControls() {

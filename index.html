@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canada Spends Dashboard</title>
+  <style>
+    :root {
+      --ink: #333333;
+      --muted: #6f6f6f;
+      --grid: #e7e7e7;
+      --accent: #36a7b8;
+      --accent-strong: #2d96a6;
+      --panel: #f7f7f7;
+      --border: #e1e1e1;
+      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #ffffff;
+      color: var(--ink);
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    header {
+      margin-bottom: 32px;
+    }
+
+    header h1 {
+      font-size: 32px;
+      margin: 0 0 8px;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .panel-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .panel-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--panel);
+      border-radius: 12px;
+    }
+
+    .controls label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .controls select,
+    .controls input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .controls .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .chart-card {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      background: #ffffff;
+    }
+
+    .chart-meta h3 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .chart-meta .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .chart-meta .note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      font-size: 12px;
+      color: var(--ink);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      background: var(--accent);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .chart {
+      margin-top: 20px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .chart svg {
+      width: 100%;
+      height: auto;
+    }
+
+    .axis-label {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+
+    .grid-line {
+      stroke: var(--grid);
+      stroke-width: 1;
+    }
+
+    .bar {
+      fill: var(--accent);
+    }
+
+    .bar-muted {
+      fill: rgba(54, 167, 184, 0.25);
+    }
+
+    .mode-stack {
+      display: grid;
+      gap: 32px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 8px;
+      background: var(--panel);
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .tab-button {
+      border: none;
+      background: transparent;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background: #ffffff;
+      color: var(--ink);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .dashboard-description {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      padding: 12px 16px;
+      background: var(--panel);
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .series-toggles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin-top: 12px;
+    }
+
+    .series-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .series-toggle input {
+      accent-color: var(--accent-strong);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(54, 167, 184, 0.12);
+      color: var(--accent-strong);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 900px) {
+      .panel {
+        padding: 18px;
+      }
+
+      .chart-meta h3 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="top-bar">
+        <div>
+          <span class="badge">Canada Spends</span>
+          <h1>Spending Dashboard</h1>
+          <p>Single-page dashboard for exploring the public CSV files. Narrow dashboards load first, with Explore mode available on demand.</p>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Dashboard modes">
+          <button class="tab-button active" id="tab-dashboards" type="button" data-tab="dashboards" role="tab" aria-selected="true">Dashboards</button>
+          <button class="tab-button" id="tab-explore" type="button" data-tab="explore" role="tab" aria-selected="false">Explore</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mode-stack">
+      <section class="panel tab-panel active" id="panel-dashboards" role="tabpanel" aria-labelledby="tab-dashboards">
+        <div class="panel-header">
+          <h2>Narrow Mode</h2>
+          <p>Preconfigured dashboards defined in dashboard_configs.json. Switch between them with the selector.</p>
+        </div>
+        <div class="controls">
+          <div>
+            <label for="narrow-select">Dashboard</label>
+            <select id="narrow-select"></select>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-meta">
+            <h3 id="narrow-title">Select a dashboard</h3>
+            <p class="subtitle" id="narrow-subtitle"></p>
+            <p class="note" id="narrow-note"></p>
+            <p class="dashboard-description" id="narrow-description"></p>
+            <div class="legend" id="narrow-legend"></div>
+          </div>
+          <div class="chart" id="narrow-chart"></div>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" id="panel-explore" role="tabpanel" aria-labelledby="tab-explore">
+        <div class="panel-header">
+          <h2>Explore Mode</h2>
+          <p>Explore any CSV, pick the grouping, series, and value fields, and toggle series on/off.</p>
+        </div>
+        <div class="controls">
+          <div>
+            <label for="open-csv">CSV Source</label>
+            <select id="open-csv"></select>
+          </div>
+          <div>
+            <label for="open-group-by">Group By</label>
+            <select id="open-group-by"></select>
+          </div>
+          <div>
+            <label for="open-series-by">Series By</label>
+            <select id="open-series-by"></select>
+          </div>
+          <div>
+            <label for="open-value-field">Value Field</label>
+            <select id="open-value-field"></select>
+          </div>
+          <div>
+            <label for="open-min-series-total">Min Series Total ($)</label>
+            <input id="open-min-series-total" type="number" min="0" value="0" />
+          </div>
+          <div>
+            <label for="open-max-series">Max Series</label>
+            <input id="open-max-series" type="number" min="1" value="12" />
+          </div>
+          <div class="checkbox">
+            <input id="open-extract-year" type="checkbox" />
+            <label for="open-extract-year">Extract year from group field</label>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-meta">
+            <h3 id="open-title">Explore Mode Snapshot</h3>
+            <p class="subtitle" id="open-subtitle">Current $ (not inflation-adjusted)</p>
+            <p class="note" id="open-note">Use the controls above to change groupings and filters.</p>
+            <div class="legend" id="open-legend"></div>
+            <div class="series-toggles" id="open-series-toggles"></div>
+          </div>
+          <div class="chart" id="open-chart"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer-note">
+      Tip: Update dashboard_configs.json or add mapping files in mappings/labels/departments to define new Narrow dashboards.
+    </div>
+  </div>
+
+  <script>
+    const csvFiles = [
+      "public/aggregated-contracts-under-10k.txt",
+      "public/contracts-over-10k.txt",
+      "public/transfers.txt",
+      "public/cihr_grants.txt",
+      "public/nserc_grants.txt",
+      "public/sshrc_grants.txt",
+      "public/global_affairs_grants.txt"
+    ];
+
+    const cache = new Map();
+
+    const openState = {
+      csv: csvFiles[0],
+      groupBy: null,
+      seriesBy: null,
+      valueField: null,
+      extractYear: false,
+      minSeriesTotal: 0,
+      maxSeries: 12,
+      seriesVisibility: new Set()
+    };
+
+    const elements = {
+      openCsv: document.getElementById("open-csv"),
+      openGroup: document.getElementById("open-group-by"),
+      openSeries: document.getElementById("open-series-by"),
+      openValue: document.getElementById("open-value-field"),
+      openExtractYear: document.getElementById("open-extract-year"),
+      openMinSeries: document.getElementById("open-min-series-total"),
+      openMaxSeries: document.getElementById("open-max-series"),
+      openChart: document.getElementById("open-chart"),
+      openLegend: document.getElementById("open-legend"),
+      openSeriesToggles: document.getElementById("open-series-toggles"),
+      narrowSelect: document.getElementById("narrow-select"),
+      narrowChart: document.getElementById("narrow-chart"),
+      narrowLegend: document.getElementById("narrow-legend"),
+      narrowTitle: document.getElementById("narrow-title"),
+      narrowSubtitle: document.getElementById("narrow-subtitle"),
+      narrowNote: document.getElementById("narrow-note"),
+      narrowDescription: document.getElementById("narrow-description"),
+      tabDashboards: document.getElementById("tab-dashboards"),
+      tabExplore: document.getElementById("tab-explore"),
+      panelDashboards: document.getElementById("panel-dashboards"),
+      panelExplore: document.getElementById("panel-explore")
+    };
+
+    function parseCSV(text) {
+      const rows = [];
+      const headers = [];
+      let current = "";
+      let inQuotes = false;
+      let row = [];
+
+      function commitValue() {
+        row.push(current);
+        current = "";
+      }
+
+      for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          commitValue();
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && next === '\n') {
+            i += 1;
+          }
+          commitValue();
+          if (row.length && row.some(value => value !== "")) {
+            if (!headers.length) {
+              headers.push(...row);
+            } else {
+              const obj = {};
+              headers.forEach((header, idx) => {
+                obj[header] = row[idx] ?? "";
+              });
+              rows.push(obj);
+            }
+          }
+          row = [];
+        } else {
+          current += char;
+        }
+      }
+
+      if (current.length || row.length) {
+        commitValue();
+        if (!headers.length) {
+          headers.push(...row);
+        } else {
+          const obj = {};
+          headers.forEach((header, idx) => {
+            obj[header] = row[idx] ?? "";
+          });
+          rows.push(obj);
+        }
+      }
+
+      return { headers, rows };
+    }
+
+    function toNumber(value) {
+      if (typeof value === "number") {
+        return value;
+      }
+      if (!value) {
+        return 0;
+      }
+      const cleaned = String(value)
+        .replace(/[$,]/g, "")
+        .replace(/\s+/g, "")
+        .replace(/\u2212/g, "-");
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function extractYear(value) {
+      if (!value) {
+        return "Unknown";
+      }
+      const match = String(value).match(/(\d{4})/);
+      return match ? match[1] : String(value).trim();
+    }
+
+    function formatCurrency(value) {
+      if (value >= 1_000_000_000) {
+        return `$${(value / 1_000_000_000).toFixed(1)}B`;
+      }
+      if (value >= 1_000_000) {
+        return `$${(value / 1_000_000).toFixed(0)}M`;
+      }
+      if (value >= 1_000) {
+        return `$${(value / 1_000).toFixed(0)}K`;
+      }
+      return `$${Math.round(value)}`;
+    }
+
+    function getSortedGroups(groups) {
+      const numeric = groups.every(group => !Number.isNaN(Number(group)));
+      if (numeric) {
+        return [...groups].sort((a, b) => Number(a) - Number(b));
+      }
+      return [...groups].sort((a, b) => String(a).localeCompare(String(b)));
+    }
+
+    function aggregateRows(rows, config) {
+      const totals = new Map();
+      const seriesTotals = new Map();
+      const groupSet = new Set();
+      const seriesSet = new Set();
+
+      rows.forEach(row => {
+        if (config.filters?.length) {
+          for (const filter of config.filters) {
+            const value = row[filter.field];
+            if (!filter.values.includes(value)) {
+              return;
+            }
+          }
+        }
+
+        if (config.mapping) {
+          const mapField = config.mapping.field;
+          const mapValue = row[mapField];
+          if (config.mapping.include?.length) {
+            if (!config.mapping.include.includes(mapValue)) {
+              return;
+            }
+          }
+          if (config.mapping.includeContains?.length) {
+            const matched = config.mapping.includeContains.some(item =>
+              String(mapValue).toLowerCase().includes(item.toLowerCase())
+            );
+            if (!matched) {
+              return;
+            }
+          }
+        }
+
+        const groupValue = config.extractYear
+          ? extractYear(row[config.groupBy])
+          : row[config.groupBy];
+        const seriesValue = config.seriesBy ? row[config.seriesBy] : "Total";
+        const value = toNumber(row[config.valueField]);
+
+        if (!groupValue) {
+          return;
+        }
+
+        groupSet.add(groupValue);
+        seriesSet.add(seriesValue);
+
+        const groupKey = String(groupValue);
+        const seriesKey = String(seriesValue);
+
+        const groupMap = totals.get(groupKey) ?? new Map();
+        groupMap.set(seriesKey, (groupMap.get(seriesKey) ?? 0) + value);
+        totals.set(groupKey, groupMap);
+
+        seriesTotals.set(seriesKey, (seriesTotals.get(seriesKey) ?? 0) + value);
+      });
+
+      let seriesList = Array.from(seriesSet);
+      if (config.topSeriesPerGroup && config.maxSeries) {
+        const topSeries = new Set();
+        totals.forEach(groupMap => {
+          const ranked = Array.from(groupMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, config.maxSeries);
+          ranked.forEach(([seriesKey]) => topSeries.add(seriesKey));
+        });
+        seriesList = Array.from(topSeries);
+        seriesList.sort((a, b) => (seriesTotals.get(b) ?? 0) - (seriesTotals.get(a) ?? 0));
+      } else {
+        if (config.minSeriesTotal) {
+          seriesList = seriesList.filter(series => (seriesTotals.get(series) ?? 0) >= config.minSeriesTotal);
+        }
+        seriesList.sort((a, b) => (seriesTotals.get(b) ?? 0) - (seriesTotals.get(a) ?? 0));
+        if (config.maxSeries) {
+          seriesList = seriesList.slice(0, config.maxSeries);
+        }
+      }
+
+      const groups = getSortedGroups(groupSet);
+      const data = groups.map(group => {
+        const series = {};
+        const groupMap = totals.get(String(group)) ?? new Map();
+        seriesList.forEach(seriesKey => {
+          series[seriesKey] = groupMap.get(seriesKey) ?? 0;
+        });
+        return { group, series };
+      });
+
+      return { groups, series: seriesList, data };
+    }
+
+    function renderLegend(container, seriesList, visibility) {
+      container.innerHTML = "";
+      seriesList.forEach((series, index) => {
+        const item = document.createElement("div");
+        item.className = "legend-item";
+        const swatch = document.createElement("span");
+        swatch.className = "legend-swatch";
+        swatch.style.background = `rgba(54, 167, 184, ${0.2 + (index / Math.max(1, seriesList.length - 1)) * 0.7})`;
+        item.appendChild(swatch);
+        const label = document.createElement("span");
+        label.textContent = series;
+        if (visibility && !visibility.has(series)) {
+          label.style.textDecoration = "line-through";
+          label.style.color = "#b0b0b0";
+        }
+        item.appendChild(label);
+        container.appendChild(item);
+      });
+    }
+
+    function renderSeriesToggles(container, seriesList, visibility, onChange) {
+      container.innerHTML = "";
+      seriesList.forEach(series => {
+        const wrapper = document.createElement("label");
+        wrapper.className = "series-toggle";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = visibility.has(series);
+        input.addEventListener("change", () => onChange(series, input.checked));
+        const span = document.createElement("span");
+        span.textContent = series;
+        wrapper.appendChild(input);
+        wrapper.appendChild(span);
+        container.appendChild(wrapper);
+      });
+    }
+
+    function renderChart(container, aggregated, options = {}) {
+      container.innerHTML = "";
+      const width = container.clientWidth || 960;
+      const height = 360;
+      const margin = { top: 20, right: 20, bottom: 40, left: 60 };
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+      const maxValue = aggregated.data.reduce((max, group) => {
+        const total = aggregated.series.reduce((sum, series) => sum + (group.series[series] ?? 0), 0);
+        return Math.max(max, total);
+      }, 0);
+
+      const yScale = value => margin.top + innerHeight - (value / (maxValue || 1)) * innerHeight;
+      const band = innerWidth / Math.max(1, aggregated.groups.length);
+      const barWidth = band * 0.65;
+
+      const gridLines = 4;
+      for (let i = 0; i <= gridLines; i += 1) {
+        const value = (maxValue / gridLines) * i;
+        const y = yScale(value);
+        const line = document.createElementNS(svg.namespaceURI, "line");
+        line.setAttribute("x1", margin.left);
+        line.setAttribute("x2", width - margin.right);
+        line.setAttribute("y1", y);
+        line.setAttribute("y2", y);
+        line.setAttribute("class", "grid-line");
+        svg.appendChild(line);
+
+        const label = document.createElementNS(svg.namespaceURI, "text");
+        label.setAttribute("x", margin.left - 8);
+        label.setAttribute("y", y + 4);
+        label.setAttribute("text-anchor", "end");
+        label.setAttribute("class", "axis-label");
+        label.textContent = formatCurrency(value);
+        svg.appendChild(label);
+      }
+
+      aggregated.data.forEach((group, index) => {
+        let yCursor = margin.top + innerHeight;
+        const x = margin.left + index * band + (band - barWidth) / 2;
+        aggregated.series.forEach((series, seriesIndex) => {
+          if (options.visibility && !options.visibility.has(series)) {
+            return;
+          }
+          const value = group.series[series] ?? 0;
+          const heightValue = (value / (maxValue || 1)) * innerHeight;
+          const rect = document.createElementNS(svg.namespaceURI, "rect");
+          rect.setAttribute("x", x);
+          rect.setAttribute("y", yCursor - heightValue);
+          rect.setAttribute("width", barWidth);
+          rect.setAttribute("height", heightValue);
+          rect.setAttribute("rx", 4);
+          rect.setAttribute("fill", `rgba(54, 167, 184, ${0.2 + (seriesIndex / Math.max(1, aggregated.series.length - 1)) * 0.7})`);
+          svg.appendChild(rect);
+          yCursor -= heightValue;
+        });
+
+        const label = document.createElementNS(svg.namespaceURI, "text");
+        label.setAttribute("x", x + barWidth / 2);
+        label.setAttribute("y", height - 12);
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("class", "axis-label");
+        label.textContent = group.group;
+        svg.appendChild(label);
+      });
+
+      container.appendChild(svg);
+    }
+
+    function setActiveTab(tab) {
+      const isDashboards = tab === "dashboards";
+      elements.panelDashboards.classList.toggle("active", isDashboards);
+      elements.panelExplore.classList.toggle("active", !isDashboards);
+      elements.tabDashboards.classList.toggle("active", isDashboards);
+      elements.tabExplore.classList.toggle("active", !isDashboards);
+      elements.tabDashboards.setAttribute("aria-selected", String(isDashboards));
+      elements.tabExplore.setAttribute("aria-selected", String(!isDashboards));
+    }
+
+    async function loadCsv(path) {
+      if (cache.has(path)) {
+        return cache.get(path);
+      }
+      const response = await fetch(path);
+      const text = await response.text();
+      const parsed = parseCSV(text);
+      cache.set(path, parsed);
+      return parsed;
+    }
+
+    function populateSelect(select, options, placeholder) {
+      select.innerHTML = "";
+      if (placeholder) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = placeholder;
+        select.appendChild(option);
+      }
+      options.forEach(optionValue => {
+        const option = document.createElement("option");
+        option.value = optionValue;
+        option.textContent = optionValue;
+        select.appendChild(option);
+      });
+    }
+
+    async function updateOpenMode() {
+      const { headers, rows } = await loadCsv(openState.csv);
+      if (!openState.groupBy) {
+        openState.groupBy = headers[0];
+      }
+      if (!openState.seriesBy) {
+        openState.seriesBy = headers[1] ?? headers[0];
+      }
+      if (!openState.valueField) {
+        openState.valueField = headers.find(header => header.toLowerCase().includes("amount")) || headers[headers.length - 1];
+      }
+
+      populateSelect(elements.openGroup, headers, null);
+      populateSelect(elements.openSeries, ["(none)", ...headers], null);
+      populateSelect(elements.openValue, headers, null);
+
+      elements.openGroup.value = openState.groupBy;
+      elements.openSeries.value = openState.seriesBy ?? "(none)";
+      elements.openValue.value = openState.valueField;
+      elements.openExtractYear.checked = openState.extractYear;
+      elements.openMinSeries.value = openState.minSeriesTotal;
+      elements.openMaxSeries.value = openState.maxSeries;
+
+      const seriesBy = openState.seriesBy === "(none)" ? null : openState.seriesBy;
+      const aggregated = aggregateRows(rows, {
+        groupBy: openState.groupBy,
+        seriesBy,
+        valueField: openState.valueField,
+        extractYear: openState.extractYear,
+        minSeriesTotal: openState.minSeriesTotal,
+        maxSeries: openState.maxSeries
+      });
+
+      if (!openState.seriesVisibility.size) {
+        aggregated.series.forEach(series => openState.seriesVisibility.add(series));
+      }
+
+      renderLegend(elements.openLegend, aggregated.series, openState.seriesVisibility);
+      renderSeriesToggles(elements.openSeriesToggles, aggregated.series, openState.seriesVisibility, (series, visible) => {
+        if (visible) {
+          openState.seriesVisibility.add(series);
+        } else {
+          openState.seriesVisibility.delete(series);
+        }
+        renderLegend(elements.openLegend, aggregated.series, openState.seriesVisibility);
+        renderChart(elements.openChart, aggregated, { visibility: openState.seriesVisibility });
+      });
+
+      renderChart(elements.openChart, aggregated, { visibility: openState.seriesVisibility });
+    }
+
+    function wireOpenControls() {
+      populateSelect(elements.openCsv, csvFiles, null);
+      elements.openCsv.value = openState.csv;
+      elements.openCsv.addEventListener("change", async event => {
+        openState.csv = event.target.value;
+        openState.groupBy = null;
+        openState.seriesBy = null;
+        openState.valueField = null;
+        openState.seriesVisibility.clear();
+        await updateOpenMode();
+      });
+
+      elements.openGroup.addEventListener("change", async event => {
+        openState.groupBy = event.target.value;
+        await updateOpenMode();
+      });
+
+      elements.openSeries.addEventListener("change", async event => {
+        openState.seriesBy = event.target.value;
+        openState.seriesVisibility.clear();
+        await updateOpenMode();
+      });
+
+      elements.openValue.addEventListener("change", async event => {
+        openState.valueField = event.target.value;
+        await updateOpenMode();
+      });
+
+      elements.openExtractYear.addEventListener("change", async event => {
+        openState.extractYear = event.target.checked;
+        await updateOpenMode();
+      });
+
+      elements.openMinSeries.addEventListener("change", async event => {
+        openState.minSeriesTotal = Number(event.target.value) || 0;
+        openState.seriesVisibility.clear();
+        await updateOpenMode();
+      });
+
+      elements.openMaxSeries.addEventListener("change", async event => {
+        openState.maxSeries = Number(event.target.value) || 12;
+        openState.seriesVisibility.clear();
+        await updateOpenMode();
+      });
+    }
+
+    async function loadDashboardConfigs() {
+      const response = await fetch("dashboard_configs.json");
+      return response.json();
+    }
+
+    async function loadMapping(path) {
+      if (!path) {
+        return null;
+      }
+      const response = await fetch(path);
+      return response.json();
+    }
+
+    async function updateNarrowMode(config) {
+      if (!config) {
+        return;
+      }
+      const csvPath = config.csvs[0];
+      const { rows } = await loadCsv(csvPath);
+      const mapping = config.mapping ? await loadMapping(config.mapping) : null;
+      const aggregated = aggregateRows(rows, {
+        groupBy: config.groupBy,
+        seriesBy: config.seriesBy,
+        valueField: config.valueField,
+        extractYear: config.extractYear,
+        minSeriesTotal: config.minSeriesTotal,
+        maxSeries: config.maxSeries,
+        topSeriesPerGroup: config.topSeriesPerGroup,
+        mapping
+      });
+
+      elements.narrowTitle.textContent = config.title;
+      elements.narrowSubtitle.textContent = config.subtitle || "";
+      elements.narrowNote.textContent = config.note || "";
+      elements.narrowDescription.textContent = config.description || "";
+
+      renderLegend(elements.narrowLegend, aggregated.series);
+      renderChart(elements.narrowChart, aggregated);
+    }
+
+    async function wireNarrowMode() {
+      const configs = await loadDashboardConfigs();
+      const dashboards = configs.dashboards ?? [];
+      populateSelect(
+        elements.narrowSelect,
+        dashboards.map(dashboard => dashboard.id),
+        null
+      );
+
+      const configMap = new Map(dashboards.map(config => [config.id, config]));
+      elements.narrowSelect.addEventListener("change", async event => {
+        const config = configMap.get(event.target.value);
+        await updateNarrowMode(config);
+      });
+
+      if (dashboards.length) {
+        elements.narrowSelect.value = dashboards[0].id;
+        await updateNarrowMode(dashboards[0]);
+      }
+    }
+
+    async function initialize() {
+      setActiveTab("dashboards");
+      elements.tabDashboards.addEventListener("click", () => setActiveTab("dashboards"));
+      elements.tabExplore.addEventListener("click", () => setActiveTab("explore"));
+      wireOpenControls();
+      await updateOpenMode();
+      await wireNarrowMode();
+    }
+
+    initialize();
+  </script>
+</body>
+</html>

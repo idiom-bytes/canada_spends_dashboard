@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "version": 1,
+    "instructions": [
+      "Add new dashboards to the dashboards array.",
+      "Each dashboard supports: csvs (array), groupBy, seriesBy, valueField, extractYear, minSeriesTotal, maxSeries, topSeriesPerGroup, mapping.",
+      "Mappings are optional JSON files in mappings/labels/departments to reuse filters across dashboards."
+    ]
+  },
+  "dashboards": [
+    {
+      "id": "healthcare-top-10",
+      "title": "Top 10 Healthcare Expenditures by Year",
+      "subtitle": "Current $ (not inflation-adjusted)",
+      "note": "Top 10 healthcare programs per year based on total award amount.",
+      "description": "CIHR grants grouped by year and program, filtered to core healthcare themes.",
+      "csvs": ["public/cihr_grants.txt"],
+      "groupBy": "competition_year",
+      "seriesBy": "program",
+      "valueField": "award_amount",
+      "extractYear": false,
+      "minSeriesTotal": 0,
+      "maxSeries": 10,
+      "topSeriesPerGroup": true,
+      "mapping": "mappings/labels/departments/healthcare.json"
+    },
+    {
+      "id": "contracts-by-buyer",
+      "title": "Contracts Over $10K by Buyer",
+      "subtitle": "Current $ (not inflation-adjusted)",
+      "note": "Top buyer departments by total contract value.",
+      "description": "Contracts over $10K grouped by reporting period and buyer department.",
+      "csvs": ["public/contracts-over-10k.txt"],
+      "groupBy": "reporting_period",
+      "seriesBy": "owner_org_title",
+      "valueField": "contract_value",
+      "extractYear": true,
+      "minSeriesTotal": 5000000,
+      "maxSeries": 10
+    }
+  ]
+}

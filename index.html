@@ -415,7 +415,7 @@
 
   <script type="module">
     // Import hyparquet for reading Parquet files in the browser
-    import { parquetRead, asyncBufferFromUrl } from 'https://cdn.jsdelivr.net/npm/hyparquet/src/index.js';
+    import { parquetRead } from 'https://cdn.jsdelivr.net/npm/hyparquet/src/index.js';
 
     // Data files (Parquet format)
     const dataFiles = [
@@ -431,16 +431,23 @@
     const cache = new Map();
 
     // Load Parquet file and convert to rows
+    // Note: We fetch the entire file as ArrayBuffer because GitHub Pages
+    // doesn't support HTTP range requests (returns 200 instead of 206),
+    // which breaks hyparquet's asyncBufferFromUrl
     async function loadParquet(name) {
       const parquetPath = `public/${name}.parquet`;
       let headers = [];
       const rows = [];
 
       try {
-        const file = await asyncBufferFromUrl({ url: parquetPath });
+        const response = await fetch(parquetPath);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
 
         await parquetRead({
-          file,
+          file: arrayBuffer,
           rowFormat: 'object',
           onComplete: (data) => {
             if (!data || data.length === 0) return;

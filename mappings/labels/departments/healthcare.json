@@ -3,11 +3,11 @@
   "label": "Healthcare research themes (CIHR)",
   "description": "Filter CIHR grants to core healthcare themes for dashboard reuse.",
   "field": "theme",
-  "include": [
+  "includeContains": [
     "Biomedical",
     "Clinical",
-    "Health Systems and Services",
-    "Population and Public Health"
+    "Health",
+    "Population"
   ],
   "instructions": "Add or remove themes to control which grants are included when building healthcare dashboards."
 }

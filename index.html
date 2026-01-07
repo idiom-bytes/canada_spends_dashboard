@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Canada Spends Dashboard</title>
+  <script type="module">
+    // Import hyparquet for reading Parquet files in the browser
+    import { parquetRead } from 'https://cdn.jsdelivr.net/npm/hyparquet/dist/hyparquet.min.js';
+    window.parquetRead = parquetRead;
+  </script>
   <style>
     :root {
       --ink: #333333;
@@ -385,20 +390,48 @@
   </div>
 
   <script>
-    const csvFiles = [
-      "public/aggregated-contracts-under-10k.csv",
-      "public/contracts-over-10k.csv",
-      "public/transfers.csv",
-      "public/cihr_grants.csv",
-      "public/nserc_grants.csv",
-      "public/sshrc_grants.csv",
-      "public/global_affairs_grants.csv"
+    // Data files (Parquet format)
+    const dataFiles = [
+      "aggregated-contracts-under-10k",
+      "contracts-over-10k",
+      "transfers",
+      "cihr_grants",
+      "nserc_grants",
+      "sshrc_grants",
+      "global_affairs_grants"
     ];
 
     const cache = new Map();
 
+    // Load Parquet file and convert to rows
+    async function loadParquet(name) {
+      const parquetPath = `public/${name}.parquet`;
+      const cacheBuster = `?_cb=${Date.now()}`;
+
+      const response = await fetch(parquetPath + cacheBuster);
+      if (!response.ok) {
+        throw new Error(`Failed to load Parquet: ${parquetPath} (${response.status})`);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      let headers = [];
+      const rows = [];
+
+      await window.parquetRead({
+        file: arrayBuffer,
+        onComplete: (data) => {
+          if (data.length === 0) return;
+          headers = Object.keys(data[0]);
+          data.forEach(row => rows.push(row));
+        }
+      });
+
+      console.log(`Loaded Parquet: ${name} (${rows.length} rows)`);
+      return { headers, rows };
+    }
+
     const openState = {
-      csv: csvFiles[0],
+      dataFile: dataFiles[0],
       groupBy: null,
       seriesBy: null,
       valueField: null,
@@ -751,20 +784,13 @@
       elements.tabExplore.setAttribute("aria-selected", String(!isDashboards));
     }
 
-    async function loadCsv(path) {
-      if (cache.has(path)) {
-        return cache.get(path);
+    async function loadData(name) {
+      if (cache.has(name)) {
+        return cache.get(name);
       }
-      // Add cache-busting parameter to force fresh fetch
-      const cacheBuster = `?_cb=${Date.now()}`;
-      const response = await fetch(path + cacheBuster);
-      if (!response.ok) {
-        throw new Error(`Failed to load CSV: ${path} (${response.status})`);
-      }
-      const text = await response.text();
-      const parsed = parseCSV(text);
-      cache.set(path, parsed);
-      return parsed;
+      const data = await loadParquet(name);
+      cache.set(name, data);
+      return data;
     }
 
     function populateSelect(select, options, placeholder) {
@@ -784,7 +810,7 @@
     }
 
     async function updateOpenMode() {
-      const { headers, rows } = await loadCsv(openState.csv);
+      const { headers, rows } = await loadData(openState.dataFile);
       if (!openState.groupBy) {
         openState.groupBy = headers[0];
       }
@@ -835,10 +861,10 @@
     }
 
     function wireOpenControls() {
-      populateSelect(elements.openCsv, csvFiles, null);
-      elements.openCsv.value = openState.csv;
+      populateSelect(elements.openCsv, dataFiles, null);
+      elements.openCsv.value = openState.dataFile;
       elements.openCsv.addEventListener("change", async event => {
-        openState.csv = event.target.value;
+        openState.dataFile = event.target.value;
         openState.groupBy = null;
         openState.seriesBy = null;
         openState.valueField = null;
@@ -943,10 +969,10 @@
           note = preAggregated.note || note;
           description = preAggregated.description || description;
         } else {
-          // Fall back to loading CSV and aggregating in browser
-          console.log(`Loading CSV for ${config.id}...`);
-          const csvPath = config.csvs[0];
-          const { rows } = await loadCsv(csvPath);
+          // Fall back to loading Parquet and aggregating in browser
+          console.log(`Loading Parquet for ${config.id}...`);
+          const dataName = config.csvs[0].replace('public/', '').replace('.csv', '');
+          const { rows } = await loadData(dataName);
           const mapping = config.mapping ? await loadMapping(config.mapping) : null;
           aggregated = aggregateRows(rows, {
             groupBy: config.groupBy,

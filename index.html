@@ -122,26 +122,12 @@
       "global_affairs_grants"
     ];
 
-    // Chart colors - BC Brandkit palette
-    // Interleaved dark/light for good contrast with any number of series
-    // Each color family paired: 700 (dark) then 400 (light)
-    const CHART_COLORS = [
-      "#707ba0", // maritime-700 - blue-gray
-      "#579eb1", // lake-400 - teal
-      "#a43131", // auburn-700 - red
-      "#b4856b", // copper-400 - copper
-      "#2a5236", // pine-700 - green
-      "#d1a1d1", // aurora-400 - purple
-      "#335b6b", // lake-700 - dark teal
-      "#a8b8d1", // maritime-400 - light blue-gray
-      "#7b4642", // copper-700 - dark copper
-      "#e68383", // auburn-400 - light red
-      "#814a7f", // aurora-700 - dark purple
-      "#699e75", // pine-400 - light green
-    ];
-
+    // Chart colors - read from CSS variables (defined in global.css)
+    // This keeps colors in one place (CSS) and avoids duplication
     function getChartColor(index) {
-      return CHART_COLORS[index % CHART_COLORS.length];
+      const colorIndex = (index % 12) + 1; // CSS uses 1-12, not 0-11
+      const cssVar = `--color-chart-${colorIndex}`;
+      return getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
     }
 
     const cache = new Map();

@@ -49,22 +49,27 @@
   --color-steel-200: #e4e6e6;
 
   /* Pine - Chart color */
+  --color-pine-200: #c2dbc8;
   --color-pine-400: #699e75;
   --color-pine-700: #2a5236;
 
   /* Lake - Chart color */
+  --color-lake-200: #b3d4de;
   --color-lake-400: #579eb1;
   --color-lake-700: #335b6b;
 
   /* Aurora - Chart color */
+  --color-aurora-200: #e8d0e8;
   --color-aurora-400: #d1a1d1;
   --color-aurora-700: #814a7f;
 
   /* Copper - Chart color */
+  --color-copper-200: #ddc4b5;
   --color-copper-400: #b4856b;
   --color-copper-700: #7b4642;
 
   /* Maritime - Chart color & links */
+  --color-maritime-200: #d3dbe8;
   --color-maritime-400: #a8b8d1;
   --color-maritime-700: #707ba0;
   --color-maritime-800: #555e7e;
@@ -92,20 +97,19 @@
   --accent: var(--color-auburn-500);
   --accent-strong: var(--color-auburn-700);
 
-  /* Chart colors - BC Brandkit palette
-     Interleaved dark/light for good contrast with any number of series */
-  --color-chart-1: var(--color-maritime-700);  /* #707ba0 - blue-gray */
-  --color-chart-2: var(--color-lake-400);      /* #579eb1 - teal */
-  --color-chart-3: var(--color-auburn-700);    /* #a43131 - red */
-  --color-chart-4: var(--color-copper-400);    /* #b4856b - copper */
-  --color-chart-5: var(--color-pine-700);      /* #2a5236 - green */
-  --color-chart-6: var(--color-aurora-400);    /* #d1a1d1 - purple */
-  --color-chart-7: var(--color-lake-700);      /* #335b6b - dark teal */
-  --color-chart-8: var(--color-maritime-400);  /* #a8b8d1 - light blue-gray */
-  --color-chart-9: var(--color-copper-700);    /* #7b4642 - dark copper */
-  --color-chart-10: var(--color-auburn-400);   /* #e68383 - light red */
-  --color-chart-11: var(--color-aurora-700);   /* #814a7f - dark purple */
-  --color-chart-12: var(--color-pine-400);     /* #699e75 - light green */
+  /* Chart colors - BC Brandkit palette (200 series - lighter/softer) */
+  --color-chart-1: var(--color-maritime-200);  /* #d3dbe8 - soft blue-gray */
+  --color-chart-2: var(--color-lake-200);      /* #b3d4de - soft teal */
+  --color-chart-3: var(--color-auburn-200);    /* #f7d1d1 - soft red */
+  --color-chart-4: var(--color-copper-200);    /* #ddc4b5 - soft copper */
+  --color-chart-5: var(--color-pine-200);      /* #c2dbc8 - soft green */
+  --color-chart-6: var(--color-aurora-200);    /* #e8d0e8 - soft purple */
+  --color-chart-7: var(--color-maritime-200);  /* #a8b8d1 - blue-gray */
+  --color-chart-8: var(--color-lake-200);      /* #579eb1 - teal */
+  --color-chart-9: var(--color-auburn-200);    /* #f1b0b0 - light red */
+  --color-chart-10: var(--color-copper-200);   /* #b4856b - copper */
+  --color-chart-11: var(--color-pine-200);     /* #699e75 - green */
+  --color-chart-12: var(--color-aurora-200);   /* #d1a1d1 - purple */
 
   /* Typography */
   font-family: "Inter", "Helvetica Neue", Arial, sans-serif;

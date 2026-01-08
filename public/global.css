@@ -92,19 +92,20 @@
   --accent: var(--color-auburn-500);
   --accent-strong: var(--color-auburn-700);
 
-  /* Chart colors - heat gradient (red high, yellow low) */
-  --color-chart-1: #B10026;
-  --color-chart-2: #E31A1C;
-  --color-chart-3: #FC4E2A;
-  --color-chart-4: #FD8D3C;
-  --color-chart-5: #FEB24C;
-  --color-chart-6: #FED976;
-  --color-chart-7: #FFF3B2;
-  --color-chart-8: #FFF8CC;
-  --color-chart-9: #FFFCE0;
-  --color-chart-10: #FFFEF0;
-  --color-chart-11: #FFFFF5;
-  --color-chart-12: #FFFFFA;
+  /* Chart colors - BC Brandkit palette
+     Interleaved dark/light for good contrast with any number of series */
+  --color-chart-1: var(--color-maritime-700);  /* #707ba0 - blue-gray */
+  --color-chart-2: var(--color-lake-400);      /* #579eb1 - teal */
+  --color-chart-3: var(--color-auburn-700);    /* #a43131 - red */
+  --color-chart-4: var(--color-copper-400);    /* #b4856b - copper */
+  --color-chart-5: var(--color-pine-700);      /* #2a5236 - green */
+  --color-chart-6: var(--color-aurora-400);    /* #d1a1d1 - purple */
+  --color-chart-7: var(--color-lake-700);      /* #335b6b - dark teal */
+  --color-chart-8: var(--color-maritime-400);  /* #a8b8d1 - light blue-gray */
+  --color-chart-9: var(--color-copper-700);    /* #7b4642 - dark copper */
+  --color-chart-10: var(--color-auburn-400);   /* #e68383 - light red */
+  --color-chart-11: var(--color-aurora-700);   /* #814a7f - dark purple */
+  --color-chart-12: var(--color-pine-400);     /* #699e75 - light green */
 
   /* Typography */
   font-family: "Inter", "Helvetica Neue", Arial, sans-serif;

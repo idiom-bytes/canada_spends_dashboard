@@ -122,20 +122,22 @@
       "global_affairs_grants"
     ];
 
-    // Chart colors - heat gradient (red high, yellow low)
+    // Chart colors - BC Brandkit palette
+    // Interleaved dark/light for good contrast with any number of series
+    // Each color family paired: 700 (dark) then 400 (light)
     const CHART_COLORS = [
-      "#B10026", // dark red
-      "#E31A1C", // red
-      "#FC4E2A", // red-orange
-      "#FD8D3C", // orange
-      "#FEB24C", // orange-yellow
-      "#FED976", // yellow
-      "#FFF3B2", // light yellow
-      "#FFF8CC", // pale yellow
-      "#FFFCE0", // very light yellow
-      "#FFFEF0", // near white
-      "#FFFFF5", // lighter
-      "#FFFFFA", // lightest
+      "#707ba0", // maritime-700 - blue-gray
+      "#579eb1", // lake-400 - teal
+      "#a43131", // auburn-700 - red
+      "#b4856b", // copper-400 - copper
+      "#2a5236", // pine-700 - green
+      "#d1a1d1", // aurora-400 - purple
+      "#335b6b", // lake-700 - dark teal
+      "#a8b8d1", // maritime-400 - light blue-gray
+      "#7b4642", // copper-700 - dark copper
+      "#e68383", // auburn-400 - light red
+      "#814a7f", // aurora-700 - dark purple
+      "#699e75", // pine-400 - light green
     ];
 
     function getChartColor(index) {

@@ -1,11 +1,105 @@
 {
   "meta": {
-    "version": 1,
+    "version": 3,
     "instructions": [
       "Add new dashboards to the dashboards array.",
-      "Each dashboard supports: csvs (array), groupBy, seriesBy, valueField, extractYear, minSeriesTotal, maxSeries, topSeriesPerGroup, mapping.",
-      "Mappings are optional JSON files in mappings/labels/departments to reuse filters across dashboards."
+      "Each dashboard supports: dataFiles, groupBy, seriesBy, valueField, extractYear, minSeriesTotal, maxSeries, topSeriesPerGroup.",
+      "Use 'filter' to filter rows: { field, include (exact match array), contains (substring match array) }",
+      "Data source defaults in 'dataSourceDefaults' provide recommended group_by, series_by, and value_field for each data source."
     ]
+  },
+  "dataSourceDefaults": {
+    "aggregated-contracts-under-10k": {
+      "displayName": "Aggregated Contracts Under $10K",
+      "description": "Small contracts under $10K aggregated by department and year",
+      "groupBy": "year",
+      "seriesBy": "owner_org_title",
+      "valueField": "contracts_goods_original_value",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["year", "owner_org_title"],
+        "seriesBy": ["owner_org_title", "(none)"],
+        "valueField": ["contracts_goods_original_value", "contracts_service_original_value", "contracts_construction_original_value", "acquisition_card_transactions_total_value"]
+      }
+    },
+    "contracts-over-10k": {
+      "displayName": "Contracts Over $10K",
+      "description": "Individual contracts over $10K with vendor and department details",
+      "groupBy": "reporting_period",
+      "seriesBy": "owner_org_title",
+      "valueField": "contract_value",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["reporting_period", "contract_date", "owner_org_title"],
+        "seriesBy": ["owner_org_title", "vendor_name", "economic_object_code", "(none)"],
+        "valueField": ["contract_value", "original_value", "amendment_value"]
+      }
+    },
+    "transfers": {
+      "displayName": "Transfer Payments",
+      "description": "Government transfer payments to provinces, organizations, and individuals",
+      "groupBy": "FSCL_YR",
+      "seriesBy": "MINE",
+      "valueField": "TOT_CY_XPND_AMT",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["FSCL_YR", "MINE", "PROVTER_EN"],
+        "seriesBy": ["MINE", "PROVTER_EN", "DEPT_EN_DESC", "RCPNT_CLS_EN_DESC", "(none)"],
+        "valueField": ["TOT_CY_XPND_AMT", "AGRG_PYMT_AMT"]
+      }
+    },
+    "cihr_grants": {
+      "displayName": "CIHR Grants",
+      "description": "Canadian Institutes of Health Research grants and funding",
+      "groupBy": "competition_year",
+      "seriesBy": "program_type",
+      "valueField": "award_amount",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["competition_year", "theme", "province"],
+        "seriesBy": ["program_type", "theme", "institution", "province", "(none)"],
+        "valueField": ["award_amount"]
+      }
+    },
+    "nserc_grants": {
+      "displayName": "NSERC Grants",
+      "description": "Natural Sciences and Engineering Research Council grants",
+      "groupBy": "fiscal_year",
+      "seriesBy": "program",
+      "valueField": "award_amount",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["fiscal_year", "competition_year", "province"],
+        "seriesBy": ["program", "institution", "department", "province", "(none)"],
+        "valueField": ["award_amount"]
+      }
+    },
+    "sshrc_grants": {
+      "displayName": "SSHRC Grants",
+      "description": "Social Sciences and Humanities Research Council grants",
+      "groupBy": "fiscal_year",
+      "seriesBy": "program",
+      "valueField": "amount",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["fiscal_year", "competition_year", "discipline"],
+        "seriesBy": ["program", "organization", "discipline", "area_of_research", "(none)"],
+        "valueField": ["amount"]
+      }
+    },
+    "global_affairs_grants": {
+      "displayName": "Global Affairs Grants",
+      "description": "International development and foreign affairs grants",
+      "groupBy": "start",
+      "seriesBy": "status",
+      "valueField": "maximumContribution",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["start", "status"],
+        "seriesBy": ["status", "executingAgencyPartner", "ContributingOrganization", "(none)"],
+        "valueField": ["maximumContribution"]
+      }
+    }
   },
   "dashboards": [
     {
@@ -14,7 +108,7 @@
       "subtitle": "Current $ (not inflation-adjusted)",
       "note": "Top grant types per year based on total award amount.",
       "description": "CIHR grants grouped by year and grant type (2007-2024).",
-      "csvs": ["public/cihr_grants.csv"],
+      "dataFiles": ["cihr_grants"],
       "groupBy": "competition_year",
       "seriesBy": "program_type",
       "valueField": "award_amount",
@@ -22,7 +116,10 @@
       "minSeriesTotal": 0,
       "maxSeries": 10,
       "topSeriesPerGroup": true,
-      "mapping": "mappings/labels/departments/healthcare.json"
+      "filter": {
+        "field": "theme",
+        "contains": ["Biomedical", "Clinical", "Health", "Population"]
+      }
     },
     {
       "id": "contracts-by-buyer",
@@ -30,7 +127,7 @@
       "subtitle": "Current $ (not inflation-adjusted)",
       "note": "Top buyer departments by total contract value.",
       "description": "Contracts over $10K grouped by reporting period and buyer department.",
-      "csvs": ["public/contracts-over-10k.csv"],
+      "dataFiles": ["contracts-over-10k"],
       "groupBy": "reporting_period",
       "seriesBy": "owner_org_title",
       "valueField": "contract_value",

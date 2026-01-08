@@ -191,6 +191,32 @@ header p {
   border-radius: 12px;
 }
 
+/* Explore mode controls - compact horizontal layout */
+.controls.explore-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: flex-end;
+}
+
+.controls.explore-controls > div {
+  flex: 0 0 auto;
+  min-width: 140px;
+}
+
+.controls.explore-controls > div:first-child {
+  min-width: 200px;
+}
+
+.controls.explore-controls .extract-year-checkbox {
+  min-width: auto;
+  padding-bottom: 8px;
+}
+
+.controls.explore-controls input[type="number"] {
+  width: 80px;
+}
+
 /* Simple controls - no background, minimal styling */
 .controls.simple {
   background: none;

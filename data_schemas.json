@@ -1,0 +1,1034 @@
+{
+  "meta": {
+    "version": 1,
+    "description": "Complete schema documentation for all Canada Spends Dashboard data sources",
+    "lastUpdated": "2025-01-07"
+  },
+  "dataSources": {
+    "aggregated-contracts-under-10k": {
+      "displayName": "Aggregated Contracts Under $10K",
+      "description": "Small government contracts under $10K aggregated by department and year. Pre-aggregated statistics rather than individual transactions.",
+      "rowCount": "~500",
+      "timeRange": "2016-present",
+      "source": "Treasury Board of Canada Secretariat",
+      "columns": {
+        "year": {
+          "type": "string",
+          "description": "Fiscal year of the contracts (e.g., '2016', '2017')",
+          "example": "2023",
+          "useFor": ["groupBy"]
+        },
+        "contract_goods_number_of": {
+          "type": "integer",
+          "description": "Count of goods contracts under $10K in this year/department",
+          "example": 150,
+          "useFor": ["valueField"]
+        },
+        "contracts_goods_original_value": {
+          "type": "float",
+          "description": "Total original value of all goods contracts under $10K",
+          "example": 450000.00,
+          "useFor": ["valueField"]
+        },
+        "contracts_goods_amendment_value": {
+          "type": "float",
+          "description": "Total amendment value for goods contracts (modifications)",
+          "example": 15000.00,
+          "useFor": ["valueField"]
+        },
+        "contract_service_number_of": {
+          "type": "integer",
+          "description": "Count of service contracts under $10K",
+          "example": 200,
+          "useFor": ["valueField"]
+        },
+        "contracts_service_original_value": {
+          "type": "float",
+          "description": "Total original value of service contracts under $10K",
+          "example": 600000.00,
+          "useFor": ["valueField"]
+        },
+        "contracts_service_amendment_value": {
+          "type": "float",
+          "description": "Total amendment value for service contracts",
+          "example": 20000.00,
+          "useFor": ["valueField"]
+        },
+        "contract_construction_number_of": {
+          "type": "integer",
+          "description": "Count of construction contracts under $10K",
+          "example": 25,
+          "useFor": ["valueField"]
+        },
+        "contracts_construction_original_value": {
+          "type": "float",
+          "description": "Total original value of construction contracts under $10K",
+          "example": 180000.00,
+          "useFor": ["valueField"]
+        },
+        "contracts_construction_amendment_value": {
+          "type": "float",
+          "description": "Total amendment value for construction contracts",
+          "example": 5000.00,
+          "useFor": ["valueField"]
+        },
+        "acquisition_card_transactions_number_of": {
+          "type": "integer",
+          "description": "Count of government acquisition card (corporate card) transactions",
+          "example": 500,
+          "useFor": ["valueField"]
+        },
+        "acquisition_card_transactions_total_value": {
+          "type": "float",
+          "description": "Total value of acquisition card transactions",
+          "example": 250000.00,
+          "useFor": ["valueField"]
+        },
+        "owner_org": {
+          "type": "string",
+          "description": "Department/organization code (e.g., 'cbsa-asfc')",
+          "example": "cbsa-asfc",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "owner_org_title": {
+          "type": "string",
+          "description": "Department/organization full name (bilingual, pipe-separated)",
+          "example": "Canada Border Services Agency | Agence des services frontaliers du Canada",
+          "useFor": ["seriesBy"]
+        }
+      },
+      "queryExamples": [
+        "Total goods contracts by year",
+        "Service contract spending by department",
+        "Acquisition card usage trends"
+      ]
+    },
+    "contracts-over-10k": {
+      "displayName": "Contracts Over $10K",
+      "description": "Individual government contracts valued over $10K with detailed procurement information, vendor details, and contract terms.",
+      "rowCount": "~230,000",
+      "timeRange": "2016-present",
+      "source": "Treasury Board of Canada Secretariat",
+      "columns": {
+        "rowid": {
+          "type": "integer",
+          "description": "Unique row identifier",
+          "useFor": []
+        },
+        "reference_number": {
+          "type": "string",
+          "description": "Government contract reference number",
+          "example": "C-2019-2020-Q4-1",
+          "useFor": ["filter"]
+        },
+        "procurement_id": {
+          "type": "string",
+          "description": "Procurement system ID",
+          "example": "P2000002",
+          "useFor": ["filter"]
+        },
+        "vendor_name": {
+          "type": "string",
+          "description": "Name of the vendor/contractor receiving the contract. IMPORTANT: Use this to search for specific companies like 'Brookfield', 'Deloitte', 'IBM', etc.",
+          "example": "Brookfield Global Integrated Solutions",
+          "useFor": ["seriesBy", "filter"],
+          "searchable": true
+        },
+        "vendor_postal_code": {
+          "type": "string",
+          "description": "Postal code of vendor's address",
+          "example": "K1A 0B1",
+          "useFor": ["filter"]
+        },
+        "buyer_name": {
+          "type": "string",
+          "description": "Name of the government buyer/department contact",
+          "example": "John Smith",
+          "useFor": []
+        },
+        "contract_date": {
+          "type": "date",
+          "description": "Date contract was signed (YYYY-MM-DD format)",
+          "example": "2023-04-15",
+          "useFor": ["groupBy"]
+        },
+        "economic_object_code": {
+          "type": "string",
+          "description": "Statistics Canada economic object code (e.g., '0351' = Communications services)",
+          "example": "0351",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "description_en": {
+          "type": "string",
+          "description": "English description of goods/services/work being procured",
+          "example": "Professional services for IT consulting",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "description_fr": {
+          "type": "string",
+          "description": "French description of goods/services/work",
+          "useFor": []
+        },
+        "contract_period_start": {
+          "type": "date",
+          "description": "Contract start date (YYYY-MM-DD)",
+          "example": "2023-04-01",
+          "useFor": ["groupBy"]
+        },
+        "delivery_date": {
+          "type": "date",
+          "description": "Expected delivery or completion date",
+          "example": "2024-03-31",
+          "useFor": []
+        },
+        "contract_value": {
+          "type": "float",
+          "description": "Total contract value including amendments. PRIMARY VALUE FIELD.",
+          "example": 250000.00,
+          "useFor": ["valueField"]
+        },
+        "original_value": {
+          "type": "float",
+          "description": "Original contract value before any amendments",
+          "example": 200000.00,
+          "useFor": ["valueField"]
+        },
+        "amendment_value": {
+          "type": "float",
+          "description": "Total value of all contract amendments/modifications",
+          "example": 50000.00,
+          "useFor": ["valueField"]
+        },
+        "comments_en": {
+          "type": "string",
+          "description": "English comments about the contract",
+          "useFor": []
+        },
+        "comments_fr": {
+          "type": "string",
+          "description": "French comments",
+          "useFor": []
+        },
+        "additional_comments_en": {
+          "type": "string",
+          "description": "English additional notes",
+          "useFor": []
+        },
+        "additional_comments_fr": {
+          "type": "string",
+          "description": "French additional notes",
+          "useFor": []
+        },
+        "agreement_type_code": {
+          "type": "string",
+          "description": "Code indicating type of agreement (S=Supply, T=Terms and conditions)",
+          "example": "S",
+          "useFor": ["filter"]
+        },
+        "trade_agreement": {
+          "type": "string",
+          "description": "Whether trade agreement applies",
+          "example": "1",
+          "useFor": ["filter"]
+        },
+        "land_claims": {
+          "type": "string",
+          "description": "Whether related to land claims settlement",
+          "useFor": ["filter"]
+        },
+        "commodity_type": {
+          "type": "string",
+          "description": "Type of commodity/service category",
+          "example": "Services",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "commodity_code": {
+          "type": "string",
+          "description": "Specific commodity code",
+          "example": "T005",
+          "useFor": ["filter"]
+        },
+        "country_of_vendor": {
+          "type": "string",
+          "description": "2-letter country code (CA=Canada, US=United States)",
+          "example": "CA",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "solicitation_procedure": {
+          "type": "string",
+          "description": "Method used to solicit bids (TN=Tendering, S=Standing Offer)",
+          "example": "TN",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "limited_tendering_reason": {
+          "type": "string",
+          "description": "If limited tendering used, the reason why",
+          "useFor": ["filter"]
+        },
+        "trade_agreement_exceptions": {
+          "type": "string",
+          "description": "Whether trade agreement exceptions apply",
+          "useFor": ["filter"]
+        },
+        "indigenous_business": {
+          "type": "string",
+          "description": "Whether vendor is an indigenous-owned business",
+          "example": "N",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "indigenous_business_excluding_psib": {
+          "type": "string",
+          "description": "Indigenous business status excluding PSIB program",
+          "useFor": ["filter"]
+        },
+        "intellectual_property": {
+          "type": "string",
+          "description": "Whether intellectual property is involved",
+          "useFor": ["filter"]
+        },
+        "potential_commercial_exploitation": {
+          "type": "string",
+          "description": "Whether commercial use is possible",
+          "useFor": ["filter"]
+        },
+        "former_public_servant": {
+          "type": "string",
+          "description": "Whether vendor employs former public servants",
+          "useFor": ["filter"]
+        },
+        "contracting_entity": {
+          "type": "string",
+          "description": "Government entity conducting the procurement",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "standing_offer_number": {
+          "type": "string",
+          "description": "Reference number if contract is against a standing offer",
+          "useFor": ["filter"]
+        },
+        "instrument_type": {
+          "type": "string",
+          "description": "Type of procurement instrument used",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "ministers_office": {
+          "type": "string",
+          "description": "Whether contract is for a Minister's office",
+          "useFor": ["filter"]
+        },
+        "number_of_bids": {
+          "type": "integer",
+          "description": "Number of bids received in the procurement",
+          "example": 5,
+          "useFor": ["valueField"]
+        },
+        "article_6_exceptions": {
+          "type": "string",
+          "description": "Whether Article 6 exceptions applied",
+          "useFor": ["filter"]
+        },
+        "award_criteria": {
+          "type": "string",
+          "description": "Criteria used to select winning vendor (lowest price, best value)",
+          "example": "Lowest Price",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "socioeconomic_indicator": {
+          "type": "string",
+          "description": "Special socioeconomic considerations",
+          "useFor": ["filter"]
+        },
+        "reporting_period": {
+          "type": "string",
+          "description": "Period when contract was reported (e.g., '2019-2020-Q4'). Good for grouping by time.",
+          "example": "2023-2024-Q1",
+          "useFor": ["groupBy"]
+        },
+        "owner_org": {
+          "type": "string",
+          "description": "Organization code of the buying government department",
+          "example": "pwgsc-tpsgc",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "owner_org_title": {
+          "type": "string",
+          "description": "Full name of the buying government department",
+          "example": "Public Services and Procurement Canada",
+          "useFor": ["seriesBy"]
+        }
+      },
+      "queryExamples": [
+        "All contracts with 'Brookfield' in vendor name",
+        "Contracts by department over time",
+        "IT consulting contracts by value",
+        "Indigenous business contracts by year",
+        "Sole-source vs competitive contracts"
+      ]
+    },
+    "transfers": {
+      "displayName": "Transfer Payments",
+      "description": "Government transfer payments to provinces, other governments, organizations, and individuals. Note: Uses French-origin field names (FSCL_YR, MINC, etc.)",
+      "rowCount": "~335,000",
+      "timeRange": "2018-present",
+      "source": "Agriculture and Agri-Food Canada / Open Canada",
+      "columns": {
+        "rowid": {
+          "type": "integer",
+          "description": "Unique row identifier",
+          "useFor": []
+        },
+        "FSCL_YR": {
+          "type": "string",
+          "description": "Fiscal year (e.g., '2023/2024')",
+          "example": "2023/2024",
+          "useFor": ["groupBy"]
+        },
+        "MINC": {
+          "type": "string",
+          "description": "Ministry/Department code",
+          "example": "042",
+          "useFor": ["filter"]
+        },
+        "MINE": {
+          "type": "string",
+          "description": "Ministry/Department name in English",
+          "example": "Agriculture and Agri-Food",
+          "useFor": ["seriesBy"]
+        },
+        "MINF": {
+          "type": "string",
+          "description": "Ministry/Department name in French",
+          "useFor": []
+        },
+        "DepartmentNumber-Numéro-de-Ministère": {
+          "type": "string",
+          "description": "Department identification number",
+          "useFor": ["filter"]
+        },
+        "DEPT_EN_DESC": {
+          "type": "string",
+          "description": "English description of transfer type/recipient class",
+          "example": "Contributions",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "DEPT_FR_DESC": {
+          "type": "string",
+          "description": "French description of transfer type",
+          "useFor": []
+        },
+        "RCPNT_CLS_EN_DESC": {
+          "type": "string",
+          "description": "English recipient class description",
+          "example": "Grants to support agricultural research",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "RCPNT_CLS_FR_DESC": {
+          "type": "string",
+          "description": "French recipient class description",
+          "useFor": []
+        },
+        "RCPNT_NML_EN_DESC": {
+          "type": "string",
+          "description": "English recipient name/description (individual, organization, province)",
+          "example": "University of Guelph",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "RCPNT_NML_FR_DESC": {
+          "type": "string",
+          "description": "French recipient name",
+          "useFor": []
+        },
+        "CTY_EN_NM": {
+          "type": "string",
+          "description": "English city name of recipient",
+          "example": "Toronto",
+          "useFor": ["filter"]
+        },
+        "CTY_FR_NM": {
+          "type": "string",
+          "description": "French city name",
+          "useFor": []
+        },
+        "PROVTER_EN": {
+          "type": "string",
+          "description": "English province or territory name",
+          "example": "Ontario",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "PROVTER_FR": {
+          "type": "string",
+          "description": "French province or territory name",
+          "useFor": []
+        },
+        "CNTRY_EN_NM": {
+          "type": "string",
+          "description": "English country name",
+          "example": "Canada",
+          "useFor": ["filter"]
+        },
+        "CNTRY_FR_NM": {
+          "type": "string",
+          "description": "French country name",
+          "useFor": []
+        },
+        "TOT_CY_XPND_AMT": {
+          "type": "float",
+          "description": "Total current year expenditure amount (PRIMARY VALUE FIELD)",
+          "example": 150000.00,
+          "useFor": ["valueField"]
+        },
+        "AGRG_PYMT_AMT": {
+          "type": "float",
+          "description": "Aggregate payment amount",
+          "example": 150000.00,
+          "useFor": ["valueField"]
+        }
+      },
+      "queryExamples": [
+        "Transfer payments by province over time",
+        "Payments to universities",
+        "Agricultural grants by year",
+        "Ministry spending on transfers"
+      ]
+    },
+    "cihr_grants": {
+      "displayName": "CIHR Grants",
+      "description": "Canadian Institutes of Health Research grants. Canada's federal health research funding agency covering biomedical, clinical, and health services research.",
+      "rowCount": "~133,000",
+      "timeRange": "2007-2024",
+      "source": "CIHR Open Data",
+      "columns": {
+        "external_id": {
+          "type": "string",
+          "description": "External unique grant identifier",
+          "useFor": ["filter"]
+        },
+        "title": {
+          "type": "string",
+          "description": "Grant/research project title",
+          "example": "Novel approaches to treating Alzheimer's disease",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "project_lead_name": {
+          "type": "string",
+          "description": "Name of principal investigator/project lead",
+          "example": "Dr. Jane Smith",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "co_researchers": {
+          "type": "string",
+          "description": "Names of co-researchers/collaborators (semicolon-separated)",
+          "example": "Dr. John Doe; Dr. Mary Johnson",
+          "useFor": []
+        },
+        "institution": {
+          "type": "string",
+          "description": "Institution where research is conducted",
+          "example": "University of Toronto",
+          "useFor": ["seriesBy", "filter"],
+          "searchable": true
+        },
+        "province": {
+          "type": "string",
+          "description": "Province of the institution",
+          "example": "Ontario",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of the institution",
+          "example": "Canada",
+          "useFor": ["filter"]
+        },
+        "competition_year": {
+          "type": "integer",
+          "description": "Year of the funding competition",
+          "example": 2023,
+          "useFor": ["groupBy"]
+        },
+        "award_amount": {
+          "type": "float",
+          "description": "Dollar amount of the grant award (PRIMARY VALUE FIELD)",
+          "example": 500000.00,
+          "useFor": ["valueField"]
+        },
+        "program": {
+          "type": "string",
+          "description": "Name of the CIHR funding program",
+          "example": "Project Grant",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "program_type": {
+          "type": "string",
+          "description": "Type/category of program",
+          "example": "Operating Grants",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "theme": {
+          "type": "string",
+          "description": "Research theme/area",
+          "example": "Biomedical",
+          "useFor": ["seriesBy", "filter"],
+          "values": ["Biomedical", "Clinical", "Health Services", "Population and Public Health"]
+        },
+        "research_subject": {
+          "type": "string",
+          "description": "Specific subject of research",
+          "example": "Cancer",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "keywords": {
+          "type": "string",
+          "description": "Keywords separated by semicolon",
+          "example": "cancer; immunotherapy; clinical trial",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "abstract": {
+          "type": "string",
+          "description": "Long text description of the research project",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "duration": {
+          "type": "string",
+          "description": "Project duration in years or months",
+          "example": "5 years",
+          "useFor": []
+        },
+        "source_url": {
+          "type": "string",
+          "description": "URL to full grant information",
+          "useFor": []
+        }
+      },
+      "queryExamples": [
+        "Cancer research funding by year",
+        "Grants by institution",
+        "Biomedical vs clinical research spending",
+        "Top-funded research themes"
+      ]
+    },
+    "nserc_grants": {
+      "displayName": "NSERC Grants",
+      "description": "Natural Sciences and Engineering Research Council grants. Covers physics, engineering, mathematics, chemistry, biology, computer science, etc.",
+      "rowCount": "~218,000",
+      "timeRange": "1990s-present",
+      "source": "NSERC Open Data",
+      "columns": {
+        "title": {
+          "type": "string",
+          "description": "Research project title",
+          "example": "Machine Learning for Climate Modeling",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "award_summary": {
+          "type": "string",
+          "description": "Brief summary of the award",
+          "useFor": []
+        },
+        "application_id": {
+          "type": "string",
+          "description": "Unique application identifier",
+          "useFor": ["filter"]
+        },
+        "competition_year": {
+          "type": "integer",
+          "description": "Year of the funding competition",
+          "example": 2023,
+          "useFor": ["groupBy"]
+        },
+        "fiscal_year": {
+          "type": "string",
+          "description": "Fiscal year (e.g., '2022-2023')",
+          "example": "2022-2023",
+          "useFor": ["groupBy"]
+        },
+        "project_lead_name": {
+          "type": "string",
+          "description": "Name of principal investigator",
+          "example": "Dr. Robert Chen",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "institution": {
+          "type": "string",
+          "description": "Institution name and province",
+          "example": "The University of British Columbia, British Columbia",
+          "useFor": ["seriesBy", "filter"],
+          "searchable": true
+        },
+        "department": {
+          "type": "string",
+          "description": "Academic department",
+          "example": "Computer Science",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "province": {
+          "type": "string",
+          "description": "Province where research is conducted",
+          "example": "British Columbia",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "award_amount": {
+          "type": "float",
+          "description": "Dollar amount of the grant (PRIMARY VALUE FIELD)",
+          "example": 35000.00,
+          "useFor": ["valueField"]
+        },
+        "installment": {
+          "type": "string",
+          "description": "Installment information if grant awarded in multiple payments",
+          "useFor": []
+        },
+        "program": {
+          "type": "string",
+          "description": "NSERC program name",
+          "example": "Discovery Grants Program",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "selection_committee": {
+          "type": "string",
+          "description": "Name of selection committee",
+          "example": "1502 - Physics",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "research_subject": {
+          "type": "string",
+          "description": "Subject area of research",
+          "example": "Artificial intelligence",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "area_of_application": {
+          "type": "string",
+          "description": "How research is applied/used",
+          "example": "Energy",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "co-researchers": {
+          "type": "string",
+          "description": "Co-investigators or collaborators",
+          "example": "No Co-Researcher",
+          "useFor": []
+        },
+        "partners": {
+          "type": "string",
+          "description": "Industry or other partners involved",
+          "example": "No Partners",
+          "useFor": ["filter"]
+        },
+        "external_id": {
+          "type": "integer",
+          "description": "External reference ID",
+          "useFor": []
+        },
+        "source_url": {
+          "type": "string",
+          "description": "URL to grant details",
+          "useFor": []
+        }
+      },
+      "queryExamples": [
+        "Engineering research by year",
+        "Grants by university",
+        "Computer science funding trends",
+        "Discovery vs targeted grants comparison"
+      ]
+    },
+    "sshrc_grants": {
+      "displayName": "SSHRC Grants",
+      "description": "Social Sciences and Humanities Research Council grants. Covers sociology, economics, literature, history, anthropology, political science, etc.",
+      "rowCount": "~213,000",
+      "timeRange": "1990s-present",
+      "source": "SSHRC Open Data",
+      "columns": {
+        "id": {
+          "type": "integer",
+          "description": "Unique grant identifier",
+          "useFor": []
+        },
+        "title": {
+          "type": "string",
+          "description": "Research project title",
+          "example": "Indigenous Knowledge and Climate Adaptation",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "program": {
+          "type": "string",
+          "description": "SSHRC program name",
+          "example": "Insight Grants",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "fiscal_year": {
+          "type": "integer",
+          "description": "Fiscal year",
+          "example": 2023,
+          "useFor": ["groupBy"]
+        },
+        "competition_year": {
+          "type": "integer",
+          "description": "Year the grant competition was held",
+          "example": 2022,
+          "useFor": ["groupBy"]
+        },
+        "applicant": {
+          "type": "string",
+          "description": "Name of principal applicant/researcher",
+          "example": "Dr. Sarah Williams",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "organization": {
+          "type": "string",
+          "description": "Institution/organization",
+          "example": "McGill University, Quebec",
+          "useFor": ["seriesBy", "filter"],
+          "searchable": true
+        },
+        "amount": {
+          "type": "float",
+          "description": "Dollar amount of the grant (PRIMARY VALUE FIELD)",
+          "example": 75000.00,
+          "useFor": ["valueField"]
+        },
+        "discipline": {
+          "type": "string",
+          "description": "Academic discipline",
+          "example": "Sociology",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "area_of_research": {
+          "type": "string",
+          "description": "Specific area of research",
+          "example": "Indigenous peoples",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "co_applicant": {
+          "type": "string",
+          "description": "Co-applicants or collaborators",
+          "example": "no co-applicant",
+          "useFor": []
+        },
+        "keywords": {
+          "type": "string",
+          "description": "Research keywords as JSON array",
+          "example": "[\"Indigenous\", \"climate\", \"adaptation\"]",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "source_url": {
+          "type": "string",
+          "description": "URL to grant details",
+          "useFor": []
+        }
+      },
+      "queryExamples": [
+        "Sociology grants by year",
+        "Indigenous research funding",
+        "Grants by discipline",
+        "University comparison in social sciences"
+      ]
+    },
+    "global_affairs_grants": {
+      "displayName": "Global Affairs Grants",
+      "description": "International development and foreign affairs grants from Global Affairs Canada. Covers bilateral and multilateral development assistance projects worldwide.",
+      "rowCount": "~2,400",
+      "timeRange": "2000s-present",
+      "source": "Global Affairs Canada Open Data",
+      "columns": {
+        "id": {
+          "type": "string",
+          "description": "Unique project identifier",
+          "useFor": ["filter"]
+        },
+        "projectNumber": {
+          "type": "string",
+          "description": "Project number in Global Affairs system",
+          "example": "D-002345",
+          "useFor": ["filter"]
+        },
+        "dateModified": {
+          "type": "datetime",
+          "description": "Last update date (ISO format)",
+          "useFor": []
+        },
+        "title": {
+          "type": "string",
+          "description": "Project title",
+          "example": "Clean Water Access Program - Kenya",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "description": {
+          "type": "string",
+          "description": "Long description of the development project",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Project status",
+          "example": "Active",
+          "useFor": ["seriesBy", "filter"],
+          "values": ["Closed", "Active", "In progress"]
+        },
+        "start": {
+          "type": "datetime",
+          "description": "Project start date",
+          "useFor": ["groupBy"]
+        },
+        "end": {
+          "type": "datetime",
+          "description": "Project end/completion date",
+          "useFor": []
+        },
+        "countries": {
+          "type": "string",
+          "description": "Target countries as JSON array with percentages",
+          "example": "[\"Kenya 50.00%\", \"Tanzania 50.00%\"]",
+          "useFor": ["filter"],
+          "searchable": true
+        },
+        "executingAgencyPartner": {
+          "type": "string",
+          "description": "Organization executing the project",
+          "example": "World Vision Canada",
+          "useFor": ["seriesBy", "filter"],
+          "searchable": true
+        },
+        "DACSectors": {
+          "type": "string",
+          "description": "Development Assistance Committee sectors as JSON array",
+          "example": "[\"Water and sanitation 100.00%\"]",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "maximumContribution": {
+          "type": "float",
+          "description": "Maximum funding contribution amount (PRIMARY VALUE FIELD)",
+          "example": 5000000.00,
+          "useFor": ["valueField"]
+        },
+        "ContributingOrganization": {
+          "type": "string",
+          "description": "Organization providing the funds",
+          "example": "Global Affairs Canada",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "expectedResults": {
+          "type": "string",
+          "description": "Expected outcomes/results of the project",
+          "useFor": []
+        },
+        "resultsAchieved": {
+          "type": "string",
+          "description": "Actual results achieved (populated after completion)",
+          "useFor": []
+        },
+        "aidType": {
+          "type": "string",
+          "description": "Type of aid",
+          "example": "Project-type interventions",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "collaborationType": {
+          "type": "string",
+          "description": "Type of collaboration",
+          "example": "Bilateral",
+          "useFor": ["seriesBy", "filter"],
+          "values": ["Bilateral", "Multilateral"]
+        },
+        "financeType": {
+          "type": "string",
+          "description": "Financial instrument type",
+          "example": "Aid grant",
+          "useFor": ["filter"]
+        },
+        "flowType": {
+          "type": "string",
+          "description": "Flow type of aid",
+          "useFor": ["filter"]
+        },
+        "reportingOrganisation": {
+          "type": "string",
+          "description": "Organization responsible for reporting",
+          "useFor": ["filter"]
+        },
+        "programName": {
+          "type": "string",
+          "description": "Development program name",
+          "example": "Bilateral Development Assistance",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "selectionMechanism": {
+          "type": "string",
+          "description": "How the project was selected",
+          "useFor": ["filter"]
+        },
+        "policyMarkers": {
+          "type": "string",
+          "description": "Cross-cutting themes as JSON array",
+          "example": "[\"Gender equality\", \"Environmental sustainability\"]",
+          "useFor": ["filter"]
+        },
+        "regions": {
+          "type": "string",
+          "description": "Geographic regions targeted",
+          "example": "Sub-Saharan Africa",
+          "useFor": ["seriesBy", "filter"]
+        },
+        "alternameImPositions": {
+          "type": "string",
+          "description": "Alternative names or positions",
+          "useFor": []
+        },
+        "budgets": {
+          "type": "string",
+          "description": "Budget breakdown as JSON array",
+          "useFor": []
+        },
+        "Locations": {
+          "type": "string",
+          "description": "Specific locations/coordinates as JSON array",
+          "useFor": []
+        },
+        "otherIdentifiers": {
+          "type": "string",
+          "description": "Other identifiers as JSON array",
+          "useFor": []
+        },
+        "participatingOrgs": {
+          "type": "string",
+          "description": "Participating organizations as JSON array",
+          "useFor": []
+        },
+        "programDataStructure": {
+          "type": "string",
+          "description": "Program data structure information",
+          "useFor": []
+        },
+        "relatedActivities": {
+          "type": "string",
+          "description": "Related activities or projects",
+          "useFor": []
+        },
+        "transactions": {
+          "type": "string",
+          "description": "Transaction details as JSON array",
+          "useFor": []
+        }
+      },
+      "queryExamples": [
+        "Development aid by country",
+        "Projects by executing agency",
+        "Bilateral vs multilateral aid comparison",
+        "Aid by sector (water, health, education)"
+      ]
+    }
+  }
+}

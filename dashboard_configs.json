@@ -1,11 +1,105 @@
 {
   "meta": {
-    "version": 2,
+    "version": 3,
     "instructions": [
       "Add new dashboards to the dashboards array.",
       "Each dashboard supports: dataFiles, groupBy, seriesBy, valueField, extractYear, minSeriesTotal, maxSeries, topSeriesPerGroup.",
-      "Use 'filter' to filter rows: { field, include (exact match array), contains (substring match array) }"
+      "Use 'filter' to filter rows: { field, include (exact match array), contains (substring match array) }",
+      "Data source defaults in 'dataSourceDefaults' provide recommended group_by, series_by, and value_field for each data source."
     ]
+  },
+  "dataSourceDefaults": {
+    "aggregated-contracts-under-10k": {
+      "displayName": "Aggregated Contracts Under $10K",
+      "description": "Small contracts under $10K aggregated by department and year",
+      "groupBy": "year",
+      "seriesBy": "owner_org_en",
+      "valueField": "contracts_goods_original_value",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["year", "owner_org_en", "quarter"],
+        "seriesBy": ["owner_org_en", "contract_goods_number_of", "(none)"],
+        "valueField": ["contracts_goods_original_value", "contracts_services_original_value", "contracts_construction_original_value"]
+      }
+    },
+    "contracts-over-10k": {
+      "displayName": "Contracts Over $10K",
+      "description": "Individual contracts over $10K with vendor and department details",
+      "groupBy": "reporting_period",
+      "seriesBy": "owner_org_title",
+      "valueField": "contract_value",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["reporting_period", "contract_date", "owner_org_title"],
+        "seriesBy": ["owner_org_title", "procurement_strategy", "solicitation_procedure", "(none)"],
+        "valueField": ["contract_value", "original_value", "amendment_value"]
+      }
+    },
+    "transfers": {
+      "displayName": "Transfer Payments",
+      "description": "Government transfer payments to provinces, organizations, and individuals",
+      "groupBy": "fiscal_year",
+      "seriesBy": "owner_org_en",
+      "valueField": "total_amount",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["fiscal_year", "owner_org_en", "recipient_type_en"],
+        "seriesBy": ["owner_org_en", "recipient_type_en", "transfer_type_en", "(none)"],
+        "valueField": ["total_amount", "number_of_transfers"]
+      }
+    },
+    "cihr_grants": {
+      "displayName": "CIHR Grants",
+      "description": "Canadian Institutes of Health Research grants and funding",
+      "groupBy": "competition_year",
+      "seriesBy": "program_type",
+      "valueField": "award_amount",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["competition_year", "theme", "program_type"],
+        "seriesBy": ["program_type", "theme", "administering_institution", "(none)"],
+        "valueField": ["award_amount"]
+      }
+    },
+    "nserc_grants": {
+      "displayName": "NSERC Grants",
+      "description": "Natural Sciences and Engineering Research Council grants",
+      "groupBy": "fiscal_year",
+      "seriesBy": "program_en",
+      "valueField": "award_amount",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["fiscal_year", "program_en", "institution_en"],
+        "seriesBy": ["program_en", "area_of_application_en", "institution_en", "(none)"],
+        "valueField": ["award_amount"]
+      }
+    },
+    "sshrc_grants": {
+      "displayName": "SSHRC Grants",
+      "description": "Social Sciences and Humanities Research Council grants",
+      "groupBy": "fiscal_year",
+      "seriesBy": "program_en",
+      "valueField": "award_amount",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["fiscal_year", "program_en", "institution_en"],
+        "seriesBy": ["program_en", "institution_en", "area_of_research_en", "(none)"],
+        "valueField": ["award_amount"]
+      }
+    },
+    "global_affairs_grants": {
+      "displayName": "Global Affairs Grants",
+      "description": "International development and foreign affairs grants",
+      "groupBy": "fiscal_year",
+      "seriesBy": "owner_org_en",
+      "valueField": "total_funding",
+      "extractYear": true,
+      "recommendedFields": {
+        "groupBy": ["fiscal_year", "owner_org_en", "country"],
+        "seriesBy": ["owner_org_en", "contribution_program_en", "country", "(none)"],
+        "valueField": ["total_funding", "number_of_grants"]
+      }
+    }
   },
   "dashboards": [
     {

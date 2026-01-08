@@ -205,6 +205,8 @@ canada_spends_dashboard/
 │   └── commands/           # Claude Code skills
 │       ├── plan-dashboard.md
 │       └── create-dashboard.md
+├── .codex/
+│   └── scripts/            # Codex agent scripts (screenshot capture)
 └── mappings/               # Reusable filter configurations
 ```
 
@@ -245,7 +247,7 @@ If you prefer to add dashboards without Claude skills:
 
 3. Optionally create pre-aggregated data in `public/dashboards/my-dashboard.json`
 
-See `README_CREATE_DASHBOARD.md` for detailed configuration options.
+See `dashboard_configs.json` and `data_schemas.json` for configuration options and field documentation.
 
 ## Contributing
 

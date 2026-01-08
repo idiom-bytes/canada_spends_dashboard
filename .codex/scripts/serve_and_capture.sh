@@ -16,5 +16,5 @@ cleanup() {
 trap cleanup EXIT
 
 sleep 1
-python scripts/capture_dashboard.py --url "${URL}" --output "${OUTPUT}" --delay-ms "${DELAY_MS}"
+python .codex/scripts/capture_dashboard.py --url "${URL}" --output "${OUTPUT}" --delay-ms "${DELAY_MS}"
 echo "Screenshot saved to ${OUTPUT}"

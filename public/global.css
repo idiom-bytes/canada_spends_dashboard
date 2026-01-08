@@ -1,0 +1,597 @@
+/* =============================================================================
+   Canada Spends Dashboard - Global Styles
+   Using BC Brandkit colour palette
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   Color Palette (from bc_brandkit_styles)
+   ----------------------------------------------------------------------------- */
+:root {
+  /* Auburn - Primary brand color */
+  --color-auburn-50: #fcf4f4;
+  --color-auburn-100: #fae6e6;
+  --color-auburn-200: #f7d1d1;
+  --color-auburn-300: #f1b0b0;
+  --color-auburn-400: #e68383;
+  --color-auburn-500: #d85b5b;
+  --color-auburn-600: #c43e3e;
+  --color-auburn-700: #a43131;
+  --color-auburn-800: #932f2f;
+  --color-auburn-900: #722a2a;
+  --color-auburn-950: #3d1212;
+
+  /* Charcoal - Text colors */
+  --color-charcoal-50: #f6f6f6;
+  --color-charcoal-100: #e7e7e7;
+  --color-charcoal-200: #d1d1d1;
+  --color-charcoal-300: #b0b0b0;
+  --color-charcoal-400: #888888;
+  --color-charcoal-500: #6d6d6d;
+  --color-charcoal-600: #5d5d5d;
+  --color-charcoal-700: #4f4f4f;
+  --color-charcoal-800: #454545;
+  --color-charcoal-900: #3d3d3d;
+  --color-charcoal-1000: #272727;
+
+  /* Linen - Background tones */
+  --color-linen-50: #fbf6f1;
+  --color-linen-100: #f6ece3;
+  --color-linen-200: #ead2be;
+
+  /* Nickel - Neutral accents */
+  --color-nickel-50: #f7f7f6;
+  --color-nickel-100: #e5e4e2;
+  --color-nickel-200: #cbc9c4;
+
+  /* Steel - Cards and panels */
+  --color-steel-50: #f7f8f7;
+  --color-steel-100: #f1f2f1;
+  --color-steel-200: #e4e6e6;
+
+  /* Pine - Chart color */
+  --color-pine-400: #699e75;
+  --color-pine-700: #2a5236;
+
+  /* Lake - Chart color */
+  --color-lake-400: #579eb1;
+  --color-lake-700: #335b6b;
+
+  /* Aurora - Chart color */
+  --color-aurora-400: #d1a1d1;
+  --color-aurora-700: #814a7f;
+
+  /* Copper - Chart color */
+  --color-copper-400: #b4856b;
+  --color-copper-700: #7b4642;
+
+  /* Maritime - Chart color & links */
+  --color-maritime-400: #a8b8d1;
+  --color-maritime-700: #707ba0;
+  --color-maritime-800: #555e7e;
+}
+
+/* -----------------------------------------------------------------------------
+   Semantic Theme Variables
+   ----------------------------------------------------------------------------- */
+:root {
+  /* Core colors */
+  --background: var(--color-linen-50);
+  --foreground: var(--color-charcoal-1000);
+  --card: var(--color-steel-50);
+  --panel: var(--color-nickel-50);
+
+  /* Text colors */
+  --ink: var(--color-charcoal-1000);
+  --muted: var(--color-charcoal-500);
+
+  /* Borders and dividers */
+  --border: var(--color-charcoal-200);
+  --grid: var(--color-charcoal-100);
+
+  /* Accent/Primary */
+  --accent: var(--color-auburn-500);
+  --accent-strong: var(--color-auburn-700);
+
+  /* Chart colors - heat gradient (red high, yellow low) */
+  --color-chart-1: #B10026;
+  --color-chart-2: #E31A1C;
+  --color-chart-3: #FC4E2A;
+  --color-chart-4: #FD8D3C;
+  --color-chart-5: #FEB24C;
+  --color-chart-6: #FED976;
+  --color-chart-7: #FFF3B2;
+  --color-chart-8: #FFF8CC;
+  --color-chart-9: #FFFCE0;
+  --color-chart-10: #FFFEF0;
+  --color-chart-11: #FFFFF5;
+  --color-chart-12: #FFFFFA;
+
+  /* Typography */
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* -----------------------------------------------------------------------------
+   Base Styles
+   ----------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--ink);
+}
+
+/* -----------------------------------------------------------------------------
+   Layout
+   ----------------------------------------------------------------------------- */
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+header {
+  margin-bottom: 32px;
+}
+
+header h1 {
+  font-size: 28px;
+  margin: 0 0 6px;
+}
+
+header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* -----------------------------------------------------------------------------
+   Panels
+   ----------------------------------------------------------------------------- */
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.panel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.panel-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* -----------------------------------------------------------------------------
+   Controls
+   ----------------------------------------------------------------------------- */
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--panel);
+  border-radius: 12px;
+}
+
+/* Simple controls - no background, minimal styling */
+.controls.simple {
+  background: none;
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+.controls.simple select {
+  padding: 10px 14px;
+  font-size: 15px;
+  max-width: 300px;
+}
+
+.controls label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.controls select,
+.controls input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  background: white;
+}
+
+.controls .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.controls.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* -----------------------------------------------------------------------------
+   Charts
+   ----------------------------------------------------------------------------- */
+.chart-card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 20px;
+  background: white;
+}
+
+.chart-meta h3 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.chart-meta .subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.chart-meta .note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.chart {
+  margin-top: 20px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.chart svg {
+  width: 100%;
+  height: auto;
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 12px;
+}
+
+.grid-line {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.bar {
+  fill: var(--accent);
+}
+
+.bar-muted {
+  fill: rgba(216, 91, 91, 0.25);
+}
+
+/* -----------------------------------------------------------------------------
+   Legend
+   ----------------------------------------------------------------------------- */
+.legend {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--accent);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* -----------------------------------------------------------------------------
+   Chart Tooltip
+   ----------------------------------------------------------------------------- */
+.chart-tooltip {
+  position: fixed;
+  display: none;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  z-index: 1000;
+  pointer-events: none;
+  max-width: 320px;
+}
+
+.chart-tooltip.visible {
+  display: block;
+}
+
+.chart-tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chart-tooltip-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.chart-tooltip-total {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.chart-tooltip-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.chart-tooltip-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.chart-tooltip-value {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* -----------------------------------------------------------------------------
+   Tabs
+   ----------------------------------------------------------------------------- */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-link {
+  display: block;
+  flex-shrink: 0;
+}
+
+.logo {
+  height: 44px;
+  width: auto;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 8px;
+  background: var(--panel);
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.tab-button {
+  border: none;
+  background: transparent;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.mode-stack {
+  display: grid;
+  gap: 32px;
+}
+
+/* -----------------------------------------------------------------------------
+   Series Toggles
+   ----------------------------------------------------------------------------- */
+.series-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+
+.series-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.series-toggle input {
+  accent-color: var(--accent-strong);
+}
+
+/* -----------------------------------------------------------------------------
+   Misc Components
+   ----------------------------------------------------------------------------- */
+.dashboard-description {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.footer-note {
+  margin-top: 24px;
+  padding: 12px 16px;
+  background: var(--panel);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.warning {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--color-auburn-50);
+  border: 1px solid var(--color-auburn-200);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--color-auburn-800);
+}
+
+.source-footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.source-footer a {
+  color: var(--color-maritime-700);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.source-footer a:hover {
+  text-decoration: underline;
+}
+
+.footer-credits {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-link {
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+
+.icon-link:hover {
+  color: var(--ink);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--color-auburn-100);
+  color: var(--accent-strong);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* -----------------------------------------------------------------------------
+   Loading States
+   ----------------------------------------------------------------------------- */
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* -----------------------------------------------------------------------------
+   Responsive
+   ----------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .panel {
+    padding: 18px;
+  }
+
+  .chart-meta h3 {
+    font-size: 20px;
+  }
+}

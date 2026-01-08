@@ -4,329 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Canada Spends Dashboard</title>
-  <style>
-    :root {
-      --ink: #333333;
-      --muted: #6f6f6f;
-      --grid: #e7e7e7;
-      --accent: #36a7b8;
-      --accent-strong: #2d96a6;
-      --panel: #f7f7f7;
-      --border: #e1e1e1;
-      font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #ffffff;
-      color: var(--ink);
-    }
-
-    .app {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px 24px 64px;
-    }
-
-    header {
-      margin-bottom: 32px;
-    }
-
-    header h1 {
-      font-size: 32px;
-      margin: 0 0 8px;
-    }
-
-    header p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.4;
-    }
-
-    .panel {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 32px;
-      background: #ffffff;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-    }
-
-    .panel-header {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .panel-header h2 {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    .panel-header p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-      padding: 16px;
-      background: var(--panel);
-      border-radius: 12px;
-    }
-
-    .controls label {
-      display: block;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .controls select,
-    .controls input {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 14px;
-    }
-
-    .controls .checkbox {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--ink);
-    }
-
-    .chart-card {
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      padding: 20px;
-      background: #ffffff;
-    }
-
-    .chart-meta h3 {
-      margin: 0 0 6px;
-      font-size: 24px;
-    }
-
-    .chart-meta .subtitle {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .chart-meta .note {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .legend {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 12px;
-      font-size: 12px;
-      color: var(--ink);
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .legend-swatch {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-      background: var(--accent);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    .chart {
-      margin-top: 20px;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .chart svg {
-      width: 100%;
-      height: auto;
-    }
-
-    .axis-label {
-      fill: var(--muted);
-      font-size: 12px;
-    }
-
-    .grid-line {
-      stroke: var(--grid);
-      stroke-width: 1;
-    }
-
-    .bar {
-      fill: var(--accent);
-    }
-
-    .bar-muted {
-      fill: rgba(54, 167, 184, 0.25);
-    }
-
-    .mode-stack {
-      display: grid;
-      gap: 32px;
-    }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    .tabs {
-      display: inline-flex;
-      gap: 8px;
-      background: var(--panel);
-      padding: 6px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-    }
-
-    .tab-button {
-      border: none;
-      background: transparent;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .tab-button.active {
-      background: #ffffff;
-      color: var(--ink);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    }
-
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
-    .dashboard-description {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .footer-note {
-      margin-top: 24px;
-      padding: 12px 16px;
-      background: var(--panel);
-      border-radius: 12px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .series-toggles {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 16px;
-      margin-top: 12px;
-    }
-
-    .series-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-    }
-
-    .series-toggle input {
-      accent-color: var(--accent-strong);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(54, 167, 184, 0.12);
-      color: var(--accent-strong);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .loading-overlay {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 40px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .controls.loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    @media (max-width: 900px) {
-      .panel {
-        padding: 18px;
-      }
-
-      .chart-meta h3 {
-        font-size: 20px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="public/global.css">
 </head>
 <body>
   <div class="app">
     <header>
       <div class="top-bar">
-        <div>
-          <h1>Canada Spends Dashboard</h1>
-          <p>Single-page dashboards and data exploration tool.</p>
+        <div class="header-left">
+          <div>
+            <h1>Canada Spends Dashboard</h1>
+            <p>Explore government spending data and build your own insights.</p>
+          </div>
         </div>
         <div class="tabs" role="tablist" aria-label="Dashboard modes">
           <button class="tab-button active" id="tab-dashboards" type="button" data-tab="dashboards" role="tab" aria-selected="true">Dashboards</button>
@@ -337,15 +25,8 @@
 
     <div class="mode-stack">
       <section class="panel tab-panel active" id="panel-dashboards" role="tabpanel" aria-labelledby="tab-dashboards">
-        <div class="panel-header">
-          <h2>Narrow Mode</h2>
-          <p>Preconfigured dashboards defined in dashboard_configs.json. Switch between them with the selector.</p>
-        </div>
-        <div class="controls">
-          <div>
-            <label for="narrow-select">Dashboard</label>
-            <select id="narrow-select"></select>
-          </div>
+        <div class="controls simple">
+          <select id="narrow-select"></select>
         </div>
         <div class="chart-card">
           <div class="chart-meta">
@@ -408,10 +89,23 @@
       </section>
     </div>
 
-    <div class="footer-note">
-      Tip: Update dashboard_configs.json or add mapping files in mappings/labels/departments to define new Narrow dashboards.
-    </div>
+    <footer class="source-footer">
+      <div class="footer-credits">
+        A project by idiom_bytes
+        <a href="https://github.com/idiom-bytes/" target="_blank" rel="noopener" aria-label="GitHub" class="icon-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <a href="https://x.com/idiom_bytes" target="_blank" rel="noopener" aria-label="Twitter" class="icon-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+      </div>
+      <div>Source data - <a href="https://canadaspends.com/" target="_blank" rel="noopener">Canada Spends</a></div>
+      <div>Create <a href="https://github.com/idiom-bytes/canada_spends_dashboard" target="_blank" rel="noopener">your own dashboard</a></div>
+    </footer>
   </div>
+
+  <!-- Tooltip for chart hover -->
+  <div id="chart-tooltip" class="chart-tooltip"></div>
 
   <script type="module">
     // Import hyparquet for reading Parquet files in the browser
@@ -427,6 +121,26 @@
       "sshrc_grants",
       "global_affairs_grants"
     ];
+
+    // Chart colors - heat gradient (red high, yellow low)
+    const CHART_COLORS = [
+      "#B10026", // dark red
+      "#E31A1C", // red
+      "#FC4E2A", // red-orange
+      "#FD8D3C", // orange
+      "#FEB24C", // orange-yellow
+      "#FED976", // yellow
+      "#FFF3B2", // light yellow
+      "#FFF8CC", // pale yellow
+      "#FFFCE0", // very light yellow
+      "#FFFEF0", // near white
+      "#FFFFF5", // lighter
+      "#FFFFFA", // lightest
+    ];
+
+    function getChartColor(index) {
+      return CHART_COLORS[index % CHART_COLORS.length];
+    }
 
     const cache = new Map();
 
@@ -727,7 +441,7 @@
         item.className = "legend-item";
         const swatch = document.createElement("span");
         swatch.className = "legend-swatch";
-        swatch.style.background = `rgba(54, 167, 184, ${0.2 + (index / Math.max(1, seriesList.length - 1)) * 0.7})`;
+        swatch.style.background = getChartColor(index);
         item.appendChild(swatch);
         const label = document.createElement("span");
         label.textContent = series;
@@ -755,6 +469,59 @@
         wrapper.appendChild(span);
         container.appendChild(wrapper);
       });
+    }
+
+    // Tooltip functions
+    const tooltip = document.getElementById("chart-tooltip");
+
+    function showTooltip(event, group, series, visibility) {
+      const visibleSeries = visibility
+        ? series.filter(s => visibility.has(s))
+        : series;
+
+      const total = visibleSeries.reduce((sum, s) => sum + (group.series[s] ?? 0), 0);
+
+      let html = `<div class="chart-tooltip-header">
+        <span class="chart-tooltip-title">${group.group}</span>
+        <span class="chart-tooltip-total">Total: ${formatCurrency(total)}</span>
+      </div>`;
+
+      visibleSeries.forEach((s, i) => {
+        const value = group.series[s] ?? 0;
+        if (value > 0) {
+          html += `
+            <div class="chart-tooltip-row">
+              <span class="chart-tooltip-swatch" style="background: ${getChartColor(series.indexOf(s))}"></span>
+              <span class="chart-tooltip-label">${s}</span>
+              <span class="chart-tooltip-value">${formatCurrency(value)}</span>
+            </div>`;
+        }
+      });
+
+      tooltip.innerHTML = html;
+      tooltip.classList.add("visible");
+      positionTooltip(event);
+    }
+
+    function positionTooltip(event) {
+      const padding = 12;
+      let x = event.clientX + padding;
+      let y = event.clientY + padding;
+
+      const rect = tooltip.getBoundingClientRect();
+      if (x + rect.width > window.innerWidth) {
+        x = event.clientX - rect.width - padding;
+      }
+      if (y + rect.height > window.innerHeight) {
+        y = event.clientY - rect.height - padding;
+      }
+
+      tooltip.style.left = x + "px";
+      tooltip.style.top = y + "px";
+    }
+
+    function hideTooltip() {
+      tooltip.classList.remove("visible");
     }
 
     function renderChart(container, aggregated, options = {}) {
@@ -812,11 +579,25 @@
           rect.setAttribute("y", yCursor - heightValue);
           rect.setAttribute("width", barWidth);
           rect.setAttribute("height", heightValue);
-          rect.setAttribute("rx", 4);
-          rect.setAttribute("fill", `rgba(54, 167, 184, ${0.2 + (seriesIndex / Math.max(1, aggregated.series.length - 1)) * 0.7})`);
+          rect.setAttribute("fill", getChartColor(seriesIndex));
           svg.appendChild(rect);
           yCursor -= heightValue;
         });
+
+        // Invisible hover area for the entire bar group
+        const hoverArea = document.createElementNS(svg.namespaceURI, "rect");
+        hoverArea.setAttribute("x", x);
+        hoverArea.setAttribute("y", margin.top);
+        hoverArea.setAttribute("width", barWidth);
+        hoverArea.setAttribute("height", innerHeight);
+        hoverArea.setAttribute("fill", "transparent");
+        hoverArea.style.cursor = "pointer";
+        hoverArea.addEventListener("mouseenter", (e) => {
+          showTooltip(e, group, aggregated.series, options.visibility);
+        });
+        hoverArea.addEventListener("mousemove", positionTooltip);
+        hoverArea.addEventListener("mouseleave", hideTooltip);
+        svg.appendChild(hoverArea);
 
         const label = document.createElementNS(svg.namespaceURI, "text");
         label.setAttribute("x", x + barWidth / 2);

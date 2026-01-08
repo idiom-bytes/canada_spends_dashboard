@@ -1,10 +1,10 @@
 {
   "meta": {
-    "version": 1,
+    "version": 2,
     "instructions": [
       "Add new dashboards to the dashboards array.",
-      "Each dashboard supports: csvs (array), groupBy, seriesBy, valueField, extractYear, minSeriesTotal, maxSeries, topSeriesPerGroup, mapping.",
-      "Mappings are optional JSON files in mappings/labels/departments to reuse filters across dashboards."
+      "Each dashboard supports: dataFiles, groupBy, seriesBy, valueField, extractYear, minSeriesTotal, maxSeries, topSeriesPerGroup.",
+      "Use 'filter' to filter rows: { field, include (exact match array), contains (substring match array) }"
     ]
   },
   "dashboards": [
@@ -14,7 +14,7 @@
       "subtitle": "Current $ (not inflation-adjusted)",
       "note": "Top grant types per year based on total award amount.",
       "description": "CIHR grants grouped by year and grant type (2007-2024).",
-      "csvs": ["public/cihr_grants.csv"],
+      "dataFiles": ["cihr_grants"],
       "groupBy": "competition_year",
       "seriesBy": "program_type",
       "valueField": "award_amount",
@@ -22,7 +22,10 @@
       "minSeriesTotal": 0,
       "maxSeries": 10,
       "topSeriesPerGroup": true,
-      "mapping": "mappings/labels/departments/healthcare.json"
+      "filter": {
+        "field": "theme",
+        "contains": ["Biomedical", "Clinical", "Health", "Population"]
+      }
     },
     {
       "id": "contracts-by-buyer",
@@ -30,7 +33,7 @@
       "subtitle": "Current $ (not inflation-adjusted)",
       "note": "Top buyer departments by total contract value.",
       "description": "Contracts over $10K grouped by reporting period and buyer department.",
-      "csvs": ["public/contracts-over-10k.csv"],
+      "dataFiles": ["contracts-over-10k"],
       "groupBy": "reporting_period",
       "seriesBy": "owner_org_title",
       "valueField": "contract_value",

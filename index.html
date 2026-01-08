@@ -647,6 +647,69 @@
       });
     }
 
+    // Populate select with recommended fields highlighted and sorted to top
+    function populateSelectWithRecommended(select, options, recommendedFields, placeholder) {
+      select.innerHTML = "";
+      if (placeholder) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = placeholder;
+        select.appendChild(option);
+      }
+
+      const recommended = recommendedFields || [];
+      const recommendedSet = new Set(recommended);
+
+      // Add recommended fields first (in order)
+      if (recommended.length > 0) {
+        const optGroup = document.createElement("optgroup");
+        optGroup.label = "Recommended";
+        recommended.forEach(fieldName => {
+          if (options.includes(fieldName) || fieldName === "(none)") {
+            const option = document.createElement("option");
+            option.value = fieldName;
+            option.textContent = fieldName;
+            option.className = "recommended-option";
+            optGroup.appendChild(option);
+          }
+        });
+        if (optGroup.children.length > 0) {
+          select.appendChild(optGroup);
+        }
+      }
+
+      // Add other fields
+      const otherFields = options.filter(f => !recommendedSet.has(f));
+      if (otherFields.length > 0) {
+        const optGroup = document.createElement("optgroup");
+        optGroup.label = "Other Fields";
+        otherFields.forEach(optionValue => {
+          const option = document.createElement("option");
+          option.value = optionValue;
+          option.textContent = optionValue;
+          optGroup.appendChild(option);
+        });
+        select.appendChild(optGroup);
+      }
+    }
+
+    // Fields to filter out from dropdowns (IDs, keys, URLs, etc.)
+    const EXCLUDED_FIELD_PATTERNS = [
+      'rowid', 'row_id', 'id', 'external_id', 'application_id', 'procurement_id',
+      'reference_number', 'source_url', 'uuid', 'key', '_id'
+    ];
+
+    function isExcludedField(fieldName) {
+      const lower = fieldName.toLowerCase();
+      return EXCLUDED_FIELD_PATTERNS.some(pattern =>
+        lower === pattern || lower.endsWith('_id') || lower.endsWith('_url')
+      );
+    }
+
+    function filterUsableHeaders(headers) {
+      return headers.filter(h => !isExcludedField(h));
+    }
+
     // Smart field selection helpers - use config defaults first, fall back to pattern matching
     function findBestGroupByField(headers, rows, dataFile) {
       // Check config defaults first
@@ -719,12 +782,19 @@
           openState.valueField = findBestValueField(headers, openState.dataFile);
         }
 
-        // Filter out useless fields like rowid
-        const usableHeaders = headers.filter(h => !['rowid', 'row_id', 'id'].includes(h.toLowerCase()));
+        // Filter out ID fields, URLs, and other non-useful fields
+        const usableHeaders = filterUsableHeaders(headers);
 
-        populateSelect(elements.openGroup, usableHeaders, null);
-        populateSelect(elements.openSeries, ["(none)", ...usableHeaders], null);
-        populateSelect(elements.openValue, usableHeaders, null);
+        // Get recommended fields for this data source
+        const defaults = dataSourceDefaults[openState.dataFile];
+        const recommendedGroupBy = defaults?.recommendedFields?.groupBy || [];
+        const recommendedSeriesBy = defaults?.recommendedFields?.seriesBy || [];
+        const recommendedValueField = defaults?.recommendedFields?.valueField || [];
+
+        // Populate dropdowns with recommended fields highlighted
+        populateSelectWithRecommended(elements.openGroup, usableHeaders, recommendedGroupBy, null);
+        populateSelectWithRecommended(elements.openSeries, ["(none)", ...usableHeaders], recommendedSeriesBy, null);
+        populateSelectWithRecommended(elements.openValue, usableHeaders, recommendedValueField, null);
 
         elements.openGroup.value = openState.groupBy;
         elements.openSeries.value = openState.seriesBy ?? "(none)";

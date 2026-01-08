@@ -13,13 +13,13 @@
       "displayName": "Aggregated Contracts Under $10K",
       "description": "Small contracts under $10K aggregated by department and year",
       "groupBy": "year",
-      "seriesBy": "owner_org_en",
+      "seriesBy": "owner_org_title",
       "valueField": "contracts_goods_original_value",
       "extractYear": true,
       "recommendedFields": {
-        "groupBy": ["year", "owner_org_en", "quarter"],
-        "seriesBy": ["owner_org_en", "contract_goods_number_of", "(none)"],
-        "valueField": ["contracts_goods_original_value", "contracts_services_original_value", "contracts_construction_original_value"]
+        "groupBy": ["year", "owner_org_title"],
+        "seriesBy": ["owner_org_title", "(none)"],
+        "valueField": ["contracts_goods_original_value", "contracts_service_original_value", "contracts_construction_original_value", "acquisition_card_transactions_total_value"]
       }
     },
     "contracts-over-10k": {
@@ -31,21 +31,21 @@
       "extractYear": true,
       "recommendedFields": {
         "groupBy": ["reporting_period", "contract_date", "owner_org_title"],
-        "seriesBy": ["owner_org_title", "procurement_strategy", "solicitation_procedure", "(none)"],
+        "seriesBy": ["owner_org_title", "vendor_name", "economic_object_code", "(none)"],
         "valueField": ["contract_value", "original_value", "amendment_value"]
       }
     },
     "transfers": {
       "displayName": "Transfer Payments",
       "description": "Government transfer payments to provinces, organizations, and individuals",
-      "groupBy": "fiscal_year",
-      "seriesBy": "owner_org_en",
-      "valueField": "total_amount",
+      "groupBy": "FSCL_YR",
+      "seriesBy": "MINE",
+      "valueField": "TOT_CY_XPND_AMT",
       "extractYear": true,
       "recommendedFields": {
-        "groupBy": ["fiscal_year", "owner_org_en", "recipient_type_en"],
-        "seriesBy": ["owner_org_en", "recipient_type_en", "transfer_type_en", "(none)"],
-        "valueField": ["total_amount", "number_of_transfers"]
+        "groupBy": ["FSCL_YR", "MINE", "PROVTER_EN"],
+        "seriesBy": ["MINE", "PROVTER_EN", "DEPT_EN_DESC", "RCPNT_CLS_EN_DESC", "(none)"],
+        "valueField": ["TOT_CY_XPND_AMT", "AGRG_PYMT_AMT"]
       }
     },
     "cihr_grants": {
@@ -56,8 +56,8 @@
       "valueField": "award_amount",
       "extractYear": true,
       "recommendedFields": {
-        "groupBy": ["competition_year", "theme", "program_type"],
-        "seriesBy": ["program_type", "theme", "administering_institution", "(none)"],
+        "groupBy": ["competition_year", "theme", "province"],
+        "seriesBy": ["program_type", "theme", "institution", "province", "(none)"],
         "valueField": ["award_amount"]
       }
     },
@@ -65,12 +65,12 @@
       "displayName": "NSERC Grants",
       "description": "Natural Sciences and Engineering Research Council grants",
       "groupBy": "fiscal_year",
-      "seriesBy": "program_en",
+      "seriesBy": "program",
       "valueField": "award_amount",
       "extractYear": true,
       "recommendedFields": {
-        "groupBy": ["fiscal_year", "program_en", "institution_en"],
-        "seriesBy": ["program_en", "area_of_application_en", "institution_en", "(none)"],
+        "groupBy": ["fiscal_year", "competition_year", "province"],
+        "seriesBy": ["program", "institution", "department", "province", "(none)"],
         "valueField": ["award_amount"]
       }
     },
@@ -78,26 +78,26 @@
       "displayName": "SSHRC Grants",
       "description": "Social Sciences and Humanities Research Council grants",
       "groupBy": "fiscal_year",
-      "seriesBy": "program_en",
-      "valueField": "award_amount",
+      "seriesBy": "program",
+      "valueField": "amount",
       "extractYear": true,
       "recommendedFields": {
-        "groupBy": ["fiscal_year", "program_en", "institution_en"],
-        "seriesBy": ["program_en", "institution_en", "area_of_research_en", "(none)"],
-        "valueField": ["award_amount"]
+        "groupBy": ["fiscal_year", "competition_year", "discipline"],
+        "seriesBy": ["program", "organization", "discipline", "area_of_research", "(none)"],
+        "valueField": ["amount"]
       }
     },
     "global_affairs_grants": {
       "displayName": "Global Affairs Grants",
       "description": "International development and foreign affairs grants",
-      "groupBy": "fiscal_year",
-      "seriesBy": "owner_org_en",
-      "valueField": "total_funding",
+      "groupBy": "start",
+      "seriesBy": "status",
+      "valueField": "maximumContribution",
       "extractYear": true,
       "recommendedFields": {
-        "groupBy": ["fiscal_year", "owner_org_en", "country"],
-        "seriesBy": ["owner_org_en", "contribution_program_en", "country", "(none)"],
-        "valueField": ["total_funding", "number_of_grants"]
+        "groupBy": ["start", "status"],
+        "seriesBy": ["status", "executingAgencyPartner", "ContributingOrganization", "(none)"],
+        "valueField": ["maximumContribution"]
       }
     }
   },

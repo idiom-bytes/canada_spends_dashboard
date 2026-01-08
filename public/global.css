@@ -262,6 +262,29 @@ header p {
   pointer-events: none;
 }
 
+/* Recommended field highlighting in dropdowns */
+.controls select optgroup[label="Recommended"] {
+  font-weight: 600;
+  color: var(--color-auburn-700);
+}
+
+.controls select optgroup[label="Recommended"] option {
+  font-weight: 500;
+  color: var(--color-auburn-700);
+  background: var(--color-auburn-50);
+}
+
+.controls select optgroup[label="Other Fields"] {
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.controls select optgroup[label="Other Fields"] option {
+  font-weight: normal;
+  color: var(--ink);
+  background: white;
+}
+
 /* -----------------------------------------------------------------------------
    Charts
    ----------------------------------------------------------------------------- */

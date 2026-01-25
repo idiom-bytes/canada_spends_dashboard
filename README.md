@@ -1,6 +1,7 @@
 # Canada Spends Dashboard
 
-A single-page dashboard for exploring Canadian government spending data. Built to run on GitHub Pages and be easy to iterate on with Claude Code.
+A single-page dashboard for exploring Canadian government spending data. Built to run on GitHub Pages and be easy to iterate on with Claude Code.  
+
 <img width="1133" height="923" alt="canada-spends-dashboard" src="https://github.com/user-attachments/assets/0dd10145-7ab4-497f-b441-3e5b93621268" />
 
 ## Features
